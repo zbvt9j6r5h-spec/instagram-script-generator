@@ -22,7 +22,7 @@ export default function AnalyzePage() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [images, setImages] = useState<string[]>([])
+  const [images, setImages] = useState<{ data: string; type: string }[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [analyzing, setAnalyzing] = useState(false)
   const [result, setResult] = useState<AnalysisResult | null>(null)
