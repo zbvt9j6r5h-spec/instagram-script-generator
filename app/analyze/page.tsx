@@ -243,38 +243,38 @@ export default function AnalyzePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <h1 className="text-lg font-bold">撮影台本ジェネレーター</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{user?.email}</span>
-            <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <span className="text-sm text-gray-600 hidden sm:block">{user?.email}</span>
+            <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900 py-2 px-2 min-h-[44px] flex items-center">
               ログアウト
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-6 py-2">
-        <div className="flex gap-4 border-b border-gray-200">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-2">
+        <div className="flex border-b border-gray-200 overflow-x-auto">
           <button
             onClick={() => router.push('/dashboard')}
-            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
+            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
           >
             台本生成
           </button>
-          <button className="px-4 py-2 text-sm font-bold text-gray-900 border-b-2 border-gray-900">
+          <button className="px-4 py-3 text-sm font-bold text-gray-900 border-b-2 border-gray-900 shrink-0 whitespace-nowrap min-h-[44px]">
             ベンチマーク分析
           </button>
           <button
             onClick={() => router.push('/account-analysis')}
-            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
+            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
           >
             アカウント分析
           </button>
         </div>
       </div>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
           <h2 className="text-sm font-bold text-gray-700 mb-1">ベンチマーク動画を分析</h2>
           <p className="text-xs text-gray-500 mb-4">
@@ -321,7 +321,7 @@ export default function AnalyzePage() {
                 className="hidden"
               />
               {previews.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mt-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
                   {previews.map((preview, i) => (
                     <div key={i} className="relative group">
                       <img
@@ -421,8 +421,8 @@ export default function AnalyzePage() {
             <div className="bg-white rounded-2xl border border-gray-200 p-6">
               <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">動画構成</div>
               {result.structure.map((s, i) => (
-                <div key={i} className="grid grid-cols-[80px_1fr] gap-2 text-sm py-2 border-b border-gray-100 last:border-0">
-                  <span className="text-gray-500">{s.time}</span>
+                <div key={i} className="flex flex-col sm:grid sm:grid-cols-[80px_1fr] gap-0.5 sm:gap-2 text-sm py-2 border-b border-gray-100 last:border-0">
+                  <span className="text-gray-400 text-xs sm:text-sm sm:text-gray-500">{s.time}</span>
                   <span>{s.description}</span>
                 </div>
               ))}

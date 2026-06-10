@@ -158,38 +158,38 @@ function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <h1 className="text-lg font-bold">撮影台本ジェネレーター</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{user?.email}</span>
-            <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <span className="text-sm text-gray-600 hidden sm:block">{user?.email}</span>
+            <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900 py-2 px-2 min-h-[44px] flex items-center">
               ログアウト
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-6 py-2">
-        <div className="flex gap-4 border-b border-gray-200">
-          <button className="px-4 py-2 text-sm font-bold text-gray-900 border-b-2 border-gray-900">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-2">
+        <div className="flex border-b border-gray-200 overflow-x-auto">
+          <button className="px-4 py-3 text-sm font-bold text-gray-900 border-b-2 border-gray-900 shrink-0 whitespace-nowrap min-h-[44px]">
             台本生成
           </button>
           <button
             onClick={() => router.push('/analyze')}
-            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
+            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
           >
             ベンチマーク分析
           </button>
           <button
             onClick={() => router.push('/account-analysis')}
-            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
+            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
           >
             アカウント分析
           </button>
         </div>
       </div>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
           <div className="space-y-4">
             <div>
@@ -199,7 +199,7 @@ function DashboardPage() {
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
                 placeholder="例：料理、コーチング、美容サロン"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500"
               />
             </div>
 
@@ -210,7 +210,7 @@ function DashboardPage() {
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 placeholder="例：30代の主婦、副業したい会社員"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500"
               />
             </div>
 
@@ -221,7 +221,7 @@ function DashboardPage() {
                 value={theme}
                 onChange={(e) => setTheme(e.target.value)}
                 placeholder="例：簡単に作れる朝食レシピ"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500"
               />
             </div>
 
@@ -293,8 +293,8 @@ function DashboardPage() {
             <div className="bg-white rounded-2xl border border-gray-200 p-6">
               <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">動画構成</div>
               {result.structure.map((s, i) => (
-                <div key={i} className="grid grid-cols-[80px_1fr_1fr] gap-2 text-sm py-2 border-b border-gray-100 last:border-0">
-                  <span className="text-gray-500">{s.time}</span>
+                <div key={i} className="flex flex-col sm:grid sm:grid-cols-[80px_1fr_1fr] gap-0.5 sm:gap-2 text-sm py-2 border-b border-gray-100 last:border-0">
+                  <span className="text-gray-400 text-xs sm:text-sm sm:text-gray-500">{s.time}</span>
                   <span className="text-gray-700">{s.action}</span>
                   <span>{s.line}</span>
                 </div>
@@ -349,9 +349,9 @@ function DashboardPage() {
                     selectedHistory?.id === h.id ? 'border-gray-900' : 'border-gray-200'
                   }`}
                 >
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-medium text-sm">{h.theme}</span>
-                    <span className="text-xs text-gray-400">
+                  <div className="flex justify-between items-start mb-1 gap-2">
+                    <span className="font-medium text-sm truncate">{h.theme}</span>
+                    <span className="text-xs text-gray-400 shrink-0">
                       {new Date(h.created_at).toLocaleDateString('ja-JP', {
                         month: 'short',
                         day: 'numeric',

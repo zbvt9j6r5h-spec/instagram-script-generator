@@ -113,38 +113,38 @@ export default function AccountAnalysisPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <h1 className="text-lg font-bold">撮影台本ジェネレーター</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{user?.email}</span>
-            <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <span className="text-sm text-gray-600 hidden sm:block">{user?.email}</span>
+            <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900 py-2 px-2 min-h-[44px] flex items-center">
               ログアウト
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-6 py-2">
-        <div className="flex gap-4 border-b border-gray-200">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-2">
+        <div className="flex border-b border-gray-200 overflow-x-auto">
           <button
             onClick={() => router.push('/dashboard')}
-            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
+            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
           >
             台本生成
           </button>
           <button
             onClick={() => router.push('/analyze')}
-            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
+            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
           >
             ベンチマーク分析
           </button>
-          <button className="px-4 py-2 text-sm font-bold text-gray-900 border-b-2 border-gray-900">
+          <button className="px-4 py-3 text-sm font-bold text-gray-900 border-b-2 border-gray-900 shrink-0 whitespace-nowrap min-h-[44px]">
             アカウント分析
           </button>
         </div>
       </div>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
           <h2 className="text-sm font-bold text-gray-700 mb-1">アカウントを分析する</h2>
           <p className="text-xs text-gray-500 mb-4">
@@ -161,7 +161,7 @@ export default function AccountAnalysisPage() {
                 value={accountUrl}
                 onChange={(e) => setAccountUrl(e.target.value)}
                 placeholder="例：@username または https://www.instagram.com/username"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500"
               />
             </div>
 
@@ -174,7 +174,7 @@ export default function AccountAnalysisPage() {
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
                 placeholder="例：料理、コーチング、美容サロン、フィットネス"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500"
               />
             </div>
 
@@ -187,7 +187,7 @@ export default function AccountAnalysisPage() {
                 value={targetAudience}
                 onChange={(e) => setTargetAudience(e.target.value)}
                 placeholder="例：30代の主婦、副業したい会社員、美容に興味のある10〜20代女性"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500"
               />
             </div>
 
@@ -200,7 +200,7 @@ export default function AccountAnalysisPage() {
                 onChange={(e) => setPostingStyle(e.target.value)}
                 placeholder="例：週3回投稿、料理の手順を縦動画で紹介。BGMあり、テロップ多め。カジュアルなトーン。フォロワー数は約1,000人"
                 rows={3}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-500 resize-none"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500 resize-none"
               />
             </div>
 
