@@ -164,6 +164,12 @@ function DashboardPage() {
           >
             ベンチマーク分析
           </button>
+          <button
+            onClick={() => router.push('/account-analysis')}
+            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
+          >
+            アカウント分析
+          </button>
         </div>
       </div>
 

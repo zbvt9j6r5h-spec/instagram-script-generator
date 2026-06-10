@@ -122,19 +122,6 @@ export default function AnalyzePage() {
       </header>
 <div className="max-w-3xl mx-auto px-6 py-2">
         <div className="flex gap-4 border-b border-gray-200">
-          <button className="px-4 py-2 text-sm font-bold text-gray-900 border-b-2 border-gray-900">
-            台本生成
-          </button>
-          <button
-            onClick={() => router.push('/analyze')}
-            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
-          >
-            ベンチマーク分析
-          </button>
-        </div>
-      </div>
-      <div className="max-w-3xl mx-auto px-6 py-2">
-        <div className="flex gap-4 border-b border-gray-200">
           <button
             onClick={() => router.push('/dashboard')}
             className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
@@ -143,6 +130,12 @@ export default function AnalyzePage() {
           </button>
           <button className="px-4 py-2 text-sm font-bold text-gray-900 border-b-2 border-gray-900">
             ベンチマーク分析
+          </button>
+          <button
+            onClick={() => router.push('/account-analysis')}
+            className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
+          >
+            アカウント分析
           </button>
         </div>
       </div>
