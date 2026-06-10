@@ -41,6 +41,7 @@ function DashboardPage() {
   const [error, setError] = useState('')
   const [history, setHistory] = useState<ScriptHistory[]>([])
   const [selectedHistory, setSelectedHistory] = useState<ScriptHistory | null>(null)
+  const [remainingUsage, setRemainingUsage] = useState<number | null>(null)
 
   useEffect(() => {
     const checkUser = async () => {
@@ -51,6 +52,16 @@ function DashboardPage() {
       }
       setUser(user)
       setLoading(false)
+
+      const now = new Date()
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      const { count } = await supabase
+        .from('usage_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('feature', 'generate-script')
+        .gte('created_at', startOfMonth.toISOString())
+      setRemainingUsage(3 - (count ?? 0))
 
       const { data: scripts } = await supabase
         .from('scripts')
@@ -89,9 +100,13 @@ function DashboardPage() {
     setResult(null)
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch('/api/generate-script', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token ?? ''}`,
+        },
         body: JSON.stringify({ genre, target, theme, duration, mood }),
       })
 
@@ -99,6 +114,7 @@ function DashboardPage() {
       if (!res.ok) throw new Error(data.error || '生成失敗')
 
       setResult(data)
+      setRemainingUsage((prev) => (prev !== null ? Math.max(0, prev - 1) : null))
 
       if (user) {
         await supabase.from('scripts').insert({
@@ -243,13 +259,23 @@ function DashboardPage() {
               </div>
             </div>
 
+            {remainingUsage !== null && (
+              <p className="text-xs text-gray-400 text-right">今月の残り回数：{remainingUsage} / 3回</p>
+            )}
+
             <button
               onClick={handleGenerate}
-              disabled={generating}
+              disabled={generating || remainingUsage === 0}
               className="w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-40"
             >
               {generating ? '生成中...' : '台本を生成する'}
             </button>
+
+            {remainingUsage === 0 && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded-lg p-3">
+                今月の無料枠を使い切りました
+              </div>
+            )}
 
             {error && (
               <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3">{error}</div>

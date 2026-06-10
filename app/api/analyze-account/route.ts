@@ -1,11 +1,31 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
+import { createAuthClient, getMonthlyUsageCount, recordUsage, FREE_LIMIT } from '@/lib/usage'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 })
 
 export async function POST(request: NextRequest) {
+  const token = request.headers.get('authorization')?.replace('Bearer ', '')
+  if (!token) {
+    return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
+  }
+
+  const supabase = createAuthClient(token)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
+  }
+
+  const usageCount = await getMonthlyUsageCount(supabase, user.id, 'analyze-account')
+  if (usageCount >= FREE_LIMIT) {
+    return NextResponse.json(
+      { error: '今月の無料枠を使い切りました', limitReached: true },
+      { status: 429 }
+    )
+  }
+
   try {
     const { accountUrl, genre, targetAudience, postingStyle } = await request.json()
 
@@ -58,6 +78,7 @@ ${accountInfo}ジャンル：${genre}
     const clean = text.replace(/```json|```/g, '').trim()
     const result = JSON.parse(clean)
 
+    await recordUsage(supabase, user.id, 'analyze-account')
     return NextResponse.json(result)
   } catch (error) {
     console.error('アカウント分析エラー:', error)

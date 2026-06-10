@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
+import { createAuthClient, getMonthlyUsageCount, recordUsage, FREE_LIMIT } from '@/lib/usage'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -14,6 +15,25 @@ function detectMediaType(base64: string): 'image/jpeg' | 'image/png' | 'image/we
 }
 
 export async function POST(request: NextRequest) {
+  const token = request.headers.get('authorization')?.replace('Bearer ', '')
+  if (!token) {
+    return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
+  }
+
+  const supabase = createAuthClient(token)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
+  }
+
+  const usageCount = await getMonthlyUsageCount(supabase, user.id, 'analyze-benchmark')
+  if (usageCount >= FREE_LIMIT) {
+    return NextResponse.json(
+      { error: '今月の無料枠を使い切りました', limitReached: true },
+      { status: 429 }
+    )
+  }
+
   try {
     const body = await request.json()
     const rawImages = body.images
@@ -88,6 +108,8 @@ JSONのみを返してください。説明文は不要です。`,
       .join('')
 
     const result = JSON.parse(text.replace(/```json|```/g, '').trim())
+
+    await recordUsage(supabase, user.id, 'analyze-benchmark')
     return NextResponse.json(result)
   } catch (error) {
     console.error('分析エラー:', error)

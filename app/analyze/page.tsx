@@ -27,6 +27,7 @@ export default function AnalyzePage() {
   const [analyzing, setAnalyzing] = useState(false)
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [error, setError] = useState('')
+  const [remainingUsage, setRemainingUsage] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -37,6 +38,17 @@ export default function AnalyzePage() {
         return
       }
       setUser(user)
+
+      const now = new Date()
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+      const { count } = await supabase
+        .from('usage_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('feature', 'analyze-benchmark')
+        .gte('created_at', startOfMonth.toISOString())
+      setRemainingUsage(3 - (count ?? 0))
+
       setLoading(false)
     }
     checkUser()
@@ -76,9 +88,13 @@ export default function AnalyzePage() {
     setResult(null)
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch('/api/analyze-benchmark', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token ?? ''}`,
+        },
         body: JSON.stringify({ images }),
       })
 
@@ -86,6 +102,7 @@ export default function AnalyzePage() {
       if (!res.ok) throw new Error(data.error || '分析失敗')
 
       setResult(data)
+      setRemainingUsage((prev) => (prev !== null ? Math.max(0, prev - 1) : null))
     } catch (e) {
       const message = e instanceof Error ? e.message : 'エラーが発生しました'
       setError(message)
@@ -185,13 +202,23 @@ export default function AnalyzePage() {
             </div>
           )}
 
+          {remainingUsage !== null && (
+            <p className="text-xs text-gray-400 text-right mt-4">今月の残り回数：{remainingUsage} / 3回</p>
+          )}
+
           <button
             onClick={handleAnalyze}
-            disabled={analyzing || images.length === 0}
-            className="w-full mt-4 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-40"
+            disabled={analyzing || images.length === 0 || remainingUsage === 0}
+            className="w-full mt-2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-40"
           >
             {analyzing ? '分析中...（20〜30秒かかります）' : `${images.length}枚の画像を分析する`}
           </button>
+
+          {remainingUsage === 0 && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded-lg p-3 mt-3">
+              今月の無料枠を使い切りました
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mt-3">{error}</div>
