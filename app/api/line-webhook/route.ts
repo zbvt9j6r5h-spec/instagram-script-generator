@@ -64,25 +64,32 @@ export async function POST(request: NextRequest) {
     if (text === '追加希望') {
       const admin = createAdminClient()
 
-      // LINEユーザーIDからSupabaseユーザーを検索
+      // LINEユーザーIDからSupabaseユーザーを検索（last_reset_atも取得）
       const { data: lineUser, error: lookupError } = await admin
         .from('line_users')
-        .select('supabase_user_id')
+        .select('supabase_user_id, last_reset_at')
         .eq('line_user_id', lineUserId)
         .single()
 
       if (lookupError || !lineUser?.supabase_user_id) {
         console.warn(`[line-webhook] line_user not found: ${lineUserId}`)
-        // ユーザーが見つからなくても返信だけ送る
         await replyMessage(replyToken, REPLY_TEXT)
         continue
       }
 
-      // 今月のusage_logsを全削除（利用回数をリセット）
-      const startOfMonth = new Date()
-      startOfMonth.setDate(1)
-      startOfMonth.setHours(0, 0, 0, 0)
+      // 今月すでにリセット済みかチェック
+      const now = new Date()
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
+      if (lineUser.last_reset_at && new Date(lineUser.last_reset_at) >= startOfMonth) {
+        console.log(`[line-webhook] already reset this month: ${lineUserId}`)
+        await replyMessage(replyToken,
+          `申し訳ありません🙏\n\n今月はすでにリセット済みです。\nリセットは月1回までとなっております。\n\n来月またご利用ください📅`
+        )
+        continue
+      }
+
+      // 今月のusage_logsを全削除（利用回数をリセット）
       const { error: deleteError } = await admin
         .from('usage_logs')
         .delete()
@@ -93,6 +100,16 @@ export async function POST(request: NextRequest) {
         console.error('[line-webhook] usage_logs削除エラー:', deleteError)
       } else {
         console.log(`[line-webhook] usage_logs reset: supabase_user_id=${lineUser.supabase_user_id}`)
+      }
+
+      // last_reset_at を現在時刻に更新
+      const { error: updateError } = await admin
+        .from('line_users')
+        .update({ last_reset_at: now.toISOString() })
+        .eq('line_user_id', lineUserId)
+
+      if (updateError) {
+        console.error('[line-webhook] last_reset_at更新エラー:', updateError)
       }
 
       await replyMessage(replyToken, REPLY_TEXT)
