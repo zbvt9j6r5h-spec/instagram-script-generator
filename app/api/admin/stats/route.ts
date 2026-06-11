@@ -16,6 +16,7 @@ function topN(values: (string | null)[], n: number) {
 }
 
 export async function GET(request: NextRequest) {
+  // 1. ユーザー認証
   const token = request.headers.get('authorization')?.replace('Bearer ', '')
   if (!token) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
 
@@ -25,35 +26,42 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'アクセス権限がありません' }, { status: 403 })
   }
 
-  const admin = createAdminClient()
+  // 2. サービスロールクライアント（RLSをバイパス）
+  let admin: ReturnType<typeof createAdminClient>
+  try {
+    admin = createAdminClient()
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'サービスロールキーの設定エラー'
+    console.error('[admin/stats]', message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 
+  // 3. データ取得
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
-  const [{ data: allScripts }, { count: monthlyCount }, { data: recentScripts }] =
-    await Promise.all([
-      admin.from('scripts').select('genre, target, theme, user_id'),
-      admin
-        .from('scripts')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', startOfMonth),
-      admin
-        .from('scripts')
-        .select('genre, target, theme, created_at')
-        .order('created_at', { ascending: false })
-        .limit(20),
-    ])
+  const [allScriptsResult, monthlyCountResult, recentScriptsResult] = await Promise.all([
+    admin.from('scripts').select('genre, target, theme, user_id'),
+    admin.from('scripts').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth),
+    admin.from('scripts').select('genre, target, theme, created_at').order('created_at', { ascending: false }).limit(20),
+  ])
 
-  const scripts = allScripts ?? []
+  // エラーがあれば詳細を返す
+  if (allScriptsResult.error) {
+    console.error('[admin/stats] scripts fetch error:', allScriptsResult.error)
+    return NextResponse.json({ error: `データ取得エラー: ${allScriptsResult.error.message}` }, { status: 500 })
+  }
+
+  const scripts = allScriptsResult.data ?? []
   const totalUsers = new Set(scripts.map((s) => s.user_id)).size
 
   return NextResponse.json({
     totalUsers,
     totalScripts: scripts.length,
-    monthlyScripts: monthlyCount ?? 0,
+    monthlyScripts: monthlyCountResult.count ?? 0,
     topGenres: topN(scripts.map((s) => s.genre), 5),
     topTargets: topN(scripts.map((s) => s.target), 5),
     topThemes: topN(scripts.map((s) => s.theme), 5),
-    recentScripts: recentScripts ?? [],
+    recentScripts: recentScriptsResult.data ?? [],
   })
 }

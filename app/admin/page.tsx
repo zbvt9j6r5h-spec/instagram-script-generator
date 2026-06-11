@@ -32,7 +32,12 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/stats', {
         headers: { Authorization: `Bearer ${session?.access_token ?? ''}` },
       })
-      if (!res.ok) { setError('データの取得に失敗しました'); setLoading(false); return }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        setError(body.error || `データの取得に失敗しました (HTTP ${res.status})`)
+        setLoading(false)
+        return
+      }
       setStats(await res.json())
       setLoading(false)
     }
@@ -54,8 +59,17 @@ export default function AdminPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">{error}</p>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl border border-red-200 p-6 max-w-lg w-full">
+          <p className="text-sm font-bold text-red-600 mb-2">エラーが発生しました</p>
+          <p className="text-sm text-gray-600 whitespace-pre-wrap">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 text-sm text-gray-500 underline"
+          >
+            再読み込み
+          </button>
+        </div>
       </div>
     )
   }
