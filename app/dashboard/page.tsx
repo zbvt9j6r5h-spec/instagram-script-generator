@@ -368,6 +368,15 @@ function DashboardPage() {
             </div>
           </div>
         )}
+
+        <footer className="mt-12 pb-6 text-center">
+          <button
+            onClick={() => router.push('/feedback')}
+            className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2"
+          >
+            フィードバックを送る
+          </button>
+        </footer>
       </main>
     </div>
   )

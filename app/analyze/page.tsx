@@ -23,7 +23,7 @@ function extractFrames(file: File): Promise<string[]> {
     const video = document.createElement('video')
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
-    if (!ctx) { reject(new Error('Canvas not supported')); return }
+    if (!ctx) { reject(new Error('Canvas APIが使用できません')); return }
 
     const timestamps = [0, 3, 6, 9, 12]
     const frames: string[] = []
