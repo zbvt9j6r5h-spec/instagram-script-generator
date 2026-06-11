@@ -31,9 +31,9 @@ function UsageLimitCard({ className = '' }: { className?: string }) {
     <div className={`bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 space-y-3 ${className}`}>
       <p className="text-sm font-semibold text-white">今月の無料枠（3回）を使い切りました 😢</p>
       <div className="text-sm text-[#888] leading-relaxed">
-        <p className="font-medium text-[#aaa] mb-1">➕ もっと使いたい方へ</p>
+        <p className="font-medium text-[#aaa] mb-1">🔄 リセットを希望の方へ</p>
         <p>LINEに登録して「追加希望」と送ると</p>
-        <p>月3回 → <span className="text-white font-semibold">5回</span>に無料で増やします 🎁</p>
+        <p>今月の利用回数を<span className="text-white font-semibold">無料でリセット</span>します 🎁</p>
       </div>
       <a
         href="https://lin.ee/WhGkd90"

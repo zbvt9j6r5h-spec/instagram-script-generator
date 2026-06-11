@@ -6,8 +6,8 @@ const REPLY_TEXT = `ありがとうございます！🙏
 
 確認しました✅
 
-月の利用回数を3回→5回に
-増やしました🎁
+今月の利用回数をリセットしました🎁
+また3回使えるようになりました！
 
 引き続きInstaScript AIをお使いください👇
 instagram-script-generator-tau.vercel.app
