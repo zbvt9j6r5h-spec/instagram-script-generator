@@ -1,5 +1,13 @@
+import { createClient } from '@supabase/supabase-js'
+
+function createAdminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase-admin'
+
 
 const ADMIN_EMAIL = 'rikicoco0709@gmail.com'
 
@@ -27,12 +35,18 @@ export async function GET(request: NextRequest) {
 
   // 2. トークンからユーザーを取得して管理者チェック
   const token = request.headers.get('authorization')?.replace('Bearer ', '')
-  if (!token) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
+if (!token) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
 
-  const { data: { user } } = await admin.auth.getUser(token)
-  if (!user || user.email !== ADMIN_EMAIL) {
-    return NextResponse.json({ error: 'アクセス権限がありません' }, { status: 403 })
-  }
+const { data: { user }, error: authError } = await admin.auth.getUser(token)
+console.log('[admin/stats] user:', user?.email, 'error:', authError)
+
+if (authError || !user) {
+  return NextResponse.json({ error: `認証エラー: ${authError?.message ?? 'ユーザーなし'}` }, { status: 401 })
+}
+
+if (user.email !== ADMIN_EMAIL) {
+  return NextResponse.json({ error: `アクセス権限がありません: ${user.email}` }, { status: 403 })
+}
 
   // 3. データ取得
   const now = new Date()
