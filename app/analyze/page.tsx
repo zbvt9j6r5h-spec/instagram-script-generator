@@ -69,6 +69,28 @@ function extractFrames(file: File): Promise<string[]> {
   })
 }
 
+function UsageLimitCard({ className = '' }: { className?: string }) {
+  return (
+    <div className={`bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 space-y-3 ${className}`}>
+      <p className="text-sm font-semibold text-white">今月の無料枠（3回）を使い切りました 😢</p>
+      <div className="text-sm text-[#888] leading-relaxed">
+        <p className="font-medium text-[#aaa] mb-1">➕ もっと使いたい方へ</p>
+        <p>LINEに登録して「追加希望」と送ると</p>
+        <p>月3回 → <span className="text-white font-semibold">5回</span>に無料で増やします 🎁</p>
+      </div>
+      <a
+        href="https://lin.ee/WhGkd90"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-center gap-2 w-full bg-[#06C755] hover:bg-[#05b34c] text-white text-sm font-semibold py-2.5 rounded-lg transition-colors"
+      >
+        <span>💬</span>
+        LINE登録はこちら
+      </a>
+    </div>
+  )
+}
+
 export default function AnalyzePage() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
@@ -391,11 +413,7 @@ export default function AnalyzePage() {
             {analyzeButtonLabel}
           </button>
 
-          {remainingUsage === 0 && (
-            <div className="bg-[#1f1a00] border border-[#3a3000] text-[#aa9900] text-sm rounded-lg p-3 mt-3">
-              今月の無料枠を使い切りました
-            </div>
-          )}
+          {remainingUsage === 0 && <UsageLimitCard className="mt-3" />}
 
           {error && (
             <div className="bg-[#1f0000] border border-[#3a0000] text-red-400 text-sm rounded-lg p-3 mt-3">{error}</div>
