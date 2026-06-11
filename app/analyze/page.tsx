@@ -234,20 +234,20 @@ export default function AnalyzePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">読み込み中...</p>
+      <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
+        <p className="text-[#555]">読み込み中...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-[#0f0f0f]">
+      <header className="bg-black border-b border-[#1a1a1a]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-          <h1 className="text-lg font-bold">撮影台本ジェネレーター</h1>
+          <h1 className="text-lg font-bold text-white">撮影台本ジェネレーター</h1>
           <div className="flex items-center gap-3 sm:gap-4">
-            <span className="text-sm text-gray-600 hidden sm:block">{user?.email}</span>
-            <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900 py-2 px-2 min-h-[44px] flex items-center">
+            <span className="text-sm text-[#555] hidden sm:block">{user?.email}</span>
+            <button onClick={handleLogout} className="text-sm text-[#666] hover:text-white py-2 px-2 min-h-[44px] flex items-center transition-colors">
               ログアウト
             </button>
           </div>
@@ -255,19 +255,19 @@ export default function AnalyzePage() {
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-2">
-        <div className="flex border-b border-gray-200 overflow-x-auto">
+        <div className="flex border-b border-[#2a2a2a] overflow-x-auto">
           <button
             onClick={() => router.push('/dashboard')}
-            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
+            className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
           >
             台本生成
           </button>
-          <button className="px-4 py-3 text-sm font-bold text-gray-900 border-b-2 border-gray-900 shrink-0 whitespace-nowrap min-h-[44px]">
+          <button className="px-4 py-3 text-sm font-bold text-white border-b-2 border-white shrink-0 whitespace-nowrap min-h-[44px]">
             ベンチマーク分析
           </button>
           <button
             onClick={() => router.push('/account-analysis')}
-            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
+            className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
           >
             アカウント分析
           </button>
@@ -275,26 +275,26 @@ export default function AnalyzePage() {
       </div>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-sm font-bold text-gray-700 mb-1">ベンチマーク動画を分析</h2>
-          <p className="text-xs text-gray-500 mb-4">
+        <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6 mb-6">
+          <h2 className="text-sm font-bold text-white mb-1">ベンチマーク動画を分析</h2>
+          <p className="text-xs text-[#666] mb-4">
             バズっているリール動画を分析し、AIが構成・演出・戦略を解説します
           </p>
 
           {/* サブタブ */}
-          <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-5">
+          <div className="flex gap-1 bg-[#111] rounded-lg p-1 mb-5">
             <button
               onClick={() => switchSubTab('image')}
-              className={`flex-1 py-1.5 rounded-md text-sm font-medium transition ${
-                subTab === 'image' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              className={`flex-1 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                subTab === 'image' ? 'bg-[#2a2a2a] text-white' : 'text-[#666] hover:text-[#aaa]'
               }`}
             >
               画像
             </button>
             <button
               onClick={() => switchSubTab('video')}
-              className={`flex-1 py-1.5 rounded-md text-sm font-medium transition ${
-                subTab === 'video' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              className={`flex-1 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                subTab === 'video' ? 'bg-[#2a2a2a] text-white' : 'text-[#666] hover:text-[#aaa]'
               }`}
             >
               動画
@@ -306,11 +306,11 @@ export default function AnalyzePage() {
             <>
               <div
                 onClick={() => imageInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-gray-400 transition"
+                className="border-2 border-dashed border-[#2a2a2a] rounded-xl p-8 text-center cursor-pointer hover:border-[#444] transition-colors"
               >
-                <div className="text-gray-400 text-3xl mb-2">📸</div>
-                <p className="text-sm text-gray-600">クリックして画像をアップロード</p>
-                <p className="text-xs text-gray-400 mt-1">複数枚OK（動画の各シーンのスクショ推奨）</p>
+                <div className="text-3xl mb-2">📸</div>
+                <p className="text-sm text-[#888]">クリックして画像をアップロード</p>
+                <p className="text-xs text-[#555] mt-1">複数枚OK（動画の各シーンのスクショ推奨）</p>
               </div>
               <input
                 ref={imageInputRef}
@@ -331,7 +331,7 @@ export default function AnalyzePage() {
                       />
                       <button
                         onClick={() => removeImage(i)}
-                        className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                        className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                       >
                         ✕
                       </button>
@@ -347,19 +347,19 @@ export default function AnalyzePage() {
             <>
               <div
                 onClick={() => videoInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-gray-400 transition"
+                className="border-2 border-dashed border-[#2a2a2a] rounded-xl p-8 text-center cursor-pointer hover:border-[#444] transition-colors"
               >
                 {videoName ? (
                   <>
-                    <div className="text-gray-400 text-3xl mb-2">🎬</div>
-                    <p className="text-sm text-gray-700 font-medium">{videoName}</p>
-                    <p className="text-xs text-gray-400 mt-1">クリックして変更</p>
+                    <div className="text-3xl mb-2">🎬</div>
+                    <p className="text-sm text-white font-medium">{videoName}</p>
+                    <p className="text-xs text-[#555] mt-1">クリックして変更</p>
                   </>
                 ) : (
                   <>
-                    <div className="text-gray-400 text-3xl mb-2">🎬</div>
-                    <p className="text-sm text-gray-600">クリックして動画をアップロード</p>
-                    <p className="text-xs text-gray-400 mt-1">mp4 / mov・50MBまで</p>
+                    <div className="text-3xl mb-2">🎬</div>
+                    <p className="text-sm text-[#888]">クリックして動画をアップロード</p>
+                    <p className="text-xs text-[#555] mt-1">mp4 / mov・50MBまで</p>
                   </>
                 )}
               </div>
@@ -371,7 +371,7 @@ export default function AnalyzePage() {
                 className="hidden"
               />
               {videoName && (
-                <p className="text-xs text-gray-400 mt-2">
+                <p className="text-xs text-[#555] mt-2">
                   0秒・3秒・6秒・9秒・12秒付近のフレームを自動抽出して分析します
                 </p>
               )}
@@ -380,96 +380,96 @@ export default function AnalyzePage() {
 
           {/* 残り回数・ボタン・エラー（共通） */}
           {remainingUsage !== null && (
-            <p className="text-xs text-gray-400 text-right mt-4">今月の残り回数：{remainingUsage} / 3回</p>
+            <p className="text-xs text-[#555] text-right mt-4">今月の残り回数：{remainingUsage} / 3回</p>
           )}
 
           <button
             onClick={handleAnalyze}
             disabled={analyzeButtonDisabled}
-            className="w-full mt-2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-40"
+            className="w-full mt-2 bg-white text-black py-3 rounded-lg font-medium hover:bg-gray-100 disabled:opacity-30 transition-colors"
           >
             {analyzeButtonLabel}
           </button>
 
           {remainingUsage === 0 && (
-            <div className="bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded-lg p-3 mt-3">
+            <div className="bg-[#1f1a00] border border-[#3a3000] text-[#aa9900] text-sm rounded-lg p-3 mt-3">
               今月の無料枠を使い切りました
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 mt-3">{error}</div>
+            <div className="bg-[#1f0000] border border-[#3a0000] text-red-400 text-sm rounded-lg p-3 mt-3">{error}</div>
           )}
         </div>
 
         {result && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">概要</div>
-              <p className="text-sm">{result.summary}</p>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-2">概要</div>
+              <p className="text-sm text-white">{result.summary}</p>
               <div className="flex gap-2 mt-3">
-                <span className="bg-blue-50 text-blue-700 text-xs rounded px-2 py-0.5">{result.genre}</span>
-                <span className="bg-green-50 text-green-700 text-xs rounded px-2 py-0.5">{result.target_audience}</span>
+                <span className="bg-[#2a2a2a] text-[#aaa] text-xs rounded px-2 py-0.5">{result.genre}</span>
+                <span className="bg-[#2a2a2a] text-[#aaa] text-xs rounded px-2 py-0.5">{result.target_audience}</span>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">つかみの手法</div>
-              <p className="text-sm font-medium">{result.hook}</p>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-2">つかみの手法</div>
+              <p className="text-sm font-medium text-white">{result.hook}</p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">動画構成</div>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">動画構成</div>
               {result.structure.map((s, i) => (
-                <div key={i} className="flex flex-col sm:grid sm:grid-cols-[80px_1fr] gap-0.5 sm:gap-2 text-sm py-2 border-b border-gray-100 last:border-0">
-                  <span className="text-gray-400 text-xs sm:text-sm sm:text-gray-500">{s.time}</span>
-                  <span>{s.description}</span>
+                <div key={i} className="flex flex-col sm:grid sm:grid-cols-[80px_1fr] gap-0.5 sm:gap-2 text-sm py-2 border-b border-[#2a2a2a] last:border-0">
+                  <span className="text-[#555] text-xs sm:text-sm">{s.time}</span>
+                  <span className="text-white">{s.description}</span>
                 </div>
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">カメラワーク</div>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">カメラワーク</div>
               <div className="space-y-2 text-sm">
-                <div><span className="text-gray-500">アングル：</span>{result.camera_work.angles}</div>
-                <div><span className="text-gray-500">動き：</span>{result.camera_work.movements}</div>
-                <div><span className="text-gray-500">トランジション：</span>{result.camera_work.transitions}</div>
+                <div><span className="text-[#666]">アングル：</span><span className="text-white">{result.camera_work.angles}</span></div>
+                <div><span className="text-[#666]">動き：</span><span className="text-white">{result.camera_work.movements}</span></div>
+                <div><span className="text-[#666]">トランジション：</span><span className="text-white">{result.camera_work.transitions}</span></div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">セッティング</div>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">セッティング</div>
               <div className="space-y-2 text-sm">
-                <div><span className="text-gray-500">背景：</span>{result.staging.background}</div>
-                <div><span className="text-gray-500">照明：</span>{result.staging.lighting}</div>
-                <div><span className="text-gray-500">小道具：</span>{result.staging.props}</div>
-                <div><span className="text-gray-500">テロップ：</span>{result.staging.text_overlay}</div>
+                <div><span className="text-[#666]">背景：</span><span className="text-white">{result.staging.background}</span></div>
+                <div><span className="text-[#666]">照明：</span><span className="text-white">{result.staging.lighting}</span></div>
+                <div><span className="text-[#666]">小道具：</span><span className="text-white">{result.staging.props}</span></div>
+                <div><span className="text-[#666]">テロップ：</span><span className="text-white">{result.staging.text_overlay}</span></div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">エンゲージメント戦略</div>
-              <p className="text-sm">{result.engagement_tactics}</p>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">エンゲージメント戦略</div>
+              <p className="text-sm text-white">{result.engagement_tactics}</p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">この動画の強み</div>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">この動画の強み</div>
               <ul className="space-y-1">
                 {result.strengths.map((s, i) => (
-                  <li key={i} className="text-sm flex gap-2">
-                    <span className="text-green-500">✓</span>
+                  <li key={i} className="text-sm flex gap-2 text-white">
+                    <span className="text-[#aaa]">✓</span>
                     {s}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">自分の動画に活かせるポイント</div>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">自分の動画に活かせるポイント</div>
               <ul className="space-y-1">
                 {result.suggestions.map((s, i) => (
-                  <li key={i} className="text-sm flex gap-2">
-                    <span className="text-blue-500">💡</span>
+                  <li key={i} className="text-sm flex gap-2 text-white">
+                    <span className="text-[#888]">→</span>
                     {s}
                   </li>
                 ))}
@@ -480,7 +480,7 @@ export default function AnalyzePage() {
               onClick={() => {
                 router.push(`/dashboard?genre=${encodeURIComponent(result.genre)}&target=${encodeURIComponent(result.target_audience)}&theme=${encodeURIComponent(result.summary)}`)
               }}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700"
+              className="w-full bg-white text-black py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"
             >
               この分析を参考に台本を生成する →
             </button>

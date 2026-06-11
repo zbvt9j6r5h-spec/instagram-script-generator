@@ -146,8 +146,8 @@ function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">読み込み中...</p>
+      <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
+        <p className="text-[#555]">読み込み中...</p>
       </div>
     )
   }
@@ -156,33 +156,33 @@ function DashboardPage() {
   const moods = ['カジュアル', 'プロフェッショナル', '感情的・共感系', '教育的']
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-[#0f0f0f]">
+      <header className="bg-black border-b border-[#1a1a1a]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-          <h1 className="text-lg font-bold">撮影台本ジェネレーター</h1>
+          <h1 className="text-lg font-bold text-white">撮影台本ジェネレーター</h1>
           <div className="flex items-center gap-3 sm:gap-4">
-            <span className="text-sm text-gray-600 hidden sm:block">{user?.email}</span>
-            <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900 py-2 px-2 min-h-[44px] flex items-center">
+            <span className="text-sm text-[#555] hidden sm:block">{user?.email}</span>
+            <button onClick={handleLogout} className="text-sm text-[#666] hover:text-white py-2 px-2 min-h-[44px] flex items-center transition-colors">
               ログアウト
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-2">
-        <div className="flex border-b border-gray-200 overflow-x-auto">
-          <button className="px-4 py-3 text-sm font-bold text-gray-900 border-b-2 border-gray-900 shrink-0 whitespace-nowrap min-h-[44px]">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-2 bg-[#0f0f0f]">
+        <div className="flex border-b border-[#2a2a2a] overflow-x-auto">
+          <button className="px-4 py-3 text-sm font-bold text-white border-b-2 border-white shrink-0 whitespace-nowrap min-h-[44px]">
             台本生成
           </button>
           <button
             onClick={() => router.push('/analyze')}
-            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
+            className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
           >
             ベンチマーク分析
           </button>
           <button
             onClick={() => router.push('/account-analysis')}
-            className="px-4 py-3 text-sm text-gray-500 hover:text-gray-900 shrink-0 whitespace-nowrap min-h-[44px]"
+            className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
           >
             アカウント分析
           </button>
@@ -190,50 +190,52 @@ function DashboardPage() {
       </div>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+        <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6 mb-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">アカウントのジャンル</label>
+              <label className="block text-sm text-[#999] mb-1">アカウントのジャンル</label>
               <input
                 type="text"
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
                 placeholder="例：料理、コーチング、美容サロン"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500"
+                className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-base sm:text-sm text-white placeholder:text-[#555] focus:outline-none focus:border-[#444]"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-600 mb-1">ターゲット</label>
+              <label className="block text-sm text-[#999] mb-1">ターゲット</label>
               <input
                 type="text"
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
                 placeholder="例：30代の主婦、副業したい会社員"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500"
+                className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-base sm:text-sm text-white placeholder:text-[#555] focus:outline-none focus:border-[#444]"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-600 mb-1">今週伝えたいテーマ</label>
+              <label className="block text-sm text-[#999] mb-1">今週伝えたいテーマ</label>
               <input
                 type="text"
                 value={theme}
                 onChange={(e) => setTheme(e.target.value)}
                 placeholder="例：簡単に作れる朝食レシピ"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:border-gray-500"
+                className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-base sm:text-sm text-white placeholder:text-[#555] focus:outline-none focus:border-[#444]"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-600 mb-2">動画の長さ</label>
+              <label className="block text-sm text-[#999] mb-2">動画の長さ</label>
               <div className="flex gap-2">
                 {durations.map((d) => (
                   <button
                     key={d}
                     onClick={() => setDuration(d)}
-                    className={`px-4 py-2 rounded-full text-sm border ${
-                      duration === d ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300'
+                    className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                      duration === d
+                        ? 'bg-white text-black border-white'
+                        : 'bg-transparent text-[#666] border-[#2a2a2a] hover:border-[#444] hover:text-white'
                     }`}
                   >
                     {d}
@@ -243,14 +245,16 @@ function DashboardPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-gray-600 mb-2">雰囲気</label>
+              <label className="block text-sm text-[#999] mb-2">雰囲気</label>
               <div className="flex flex-wrap gap-2">
                 {moods.map((m) => (
                   <button
                     key={m}
                     onClick={() => setMood(m)}
-                    className={`px-4 py-2 rounded-full text-sm border ${
-                      mood === m ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300'
+                    className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                      mood === m
+                        ? 'bg-white text-black border-white'
+                        : 'bg-transparent text-[#666] border-[#2a2a2a] hover:border-[#444] hover:text-white'
                     }`}
                   >
                     {m}
@@ -260,71 +264,71 @@ function DashboardPage() {
             </div>
 
             {remainingUsage !== null && (
-              <p className="text-xs text-gray-400 text-right">今月の残り回数：{remainingUsage} / 3回</p>
+              <p className="text-xs text-[#555] text-right">今月の残り回数：{remainingUsage} / 3回</p>
             )}
 
             <button
               onClick={handleGenerate}
               disabled={generating || remainingUsage === 0}
-              className="w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 disabled:opacity-40"
+              className="w-full bg-white text-black py-3 rounded-lg font-medium hover:bg-gray-100 disabled:opacity-30 transition-colors"
             >
               {generating ? '生成中...' : '台本を生成する'}
             </button>
 
             {remainingUsage === 0 && (
-              <div className="bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded-lg p-3">
+              <div className="bg-[#1f1a00] border border-[#3a3000] text-[#aa9900] text-sm rounded-lg p-3">
                 今月の無料枠を使い切りました
               </div>
             )}
 
             {error && (
-              <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3">{error}</div>
+              <div className="bg-[#1f0000] border border-[#3a0000] text-red-400 text-sm rounded-lg p-3">{error}</div>
             )}
           </div>
         </div>
 
         {result && (
           <div className="space-y-4 mb-12">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">つかみ</div>
-              <div className="text-lg font-bold">&ldquo;{result.hook}&rdquo;</div>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-2">つかみ</div>
+              <div className="text-lg font-bold text-white">&ldquo;{result.hook}&rdquo;</div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">動画構成</div>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">動画構成</div>
               {result.structure.map((s, i) => (
-                <div key={i} className="flex flex-col sm:grid sm:grid-cols-[80px_1fr_1fr] gap-0.5 sm:gap-2 text-sm py-2 border-b border-gray-100 last:border-0">
-                  <span className="text-gray-400 text-xs sm:text-sm sm:text-gray-500">{s.time}</span>
-                  <span className="text-gray-700">{s.action}</span>
-                  <span>{s.line}</span>
+                <div key={i} className="flex flex-col sm:grid sm:grid-cols-[80px_1fr_1fr] gap-0.5 sm:gap-2 text-sm py-2 border-b border-[#2a2a2a] last:border-0">
+                  <span className="text-[#555] text-xs sm:text-sm">{s.time}</span>
+                  <span className="text-[#aaa]">{s.action}</span>
+                  <span className="text-white">{s.line}</span>
                 </div>
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">カメラ指示</div>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">カメラ指示</div>
               <div className="space-y-2 text-sm">
-                <div><span className="text-gray-500">アングル：</span>{result.camera.angle}</div>
-                <div><span className="text-gray-500">位置・距離：</span>{result.camera.position}</div>
-                <div><span className="text-gray-500">動き：</span>{result.camera.movement}</div>
+                <div><span className="text-[#666]">アングル：</span><span className="text-white">{result.camera.angle}</span></div>
+                <div><span className="text-[#666]">位置・距離：</span><span className="text-white">{result.camera.position}</span></div>
+                <div><span className="text-[#666]">動き：</span><span className="text-white">{result.camera.movement}</span></div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">セッティング</div>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">セッティング</div>
               <div className="space-y-2 text-sm">
-                <div><span className="text-gray-500">背景：</span>{result.staging.background}</div>
-                <div><span className="text-gray-500">照明：</span>{result.staging.lighting}</div>
-                <div><span className="text-gray-500">小道具：</span>{result.staging.props}</div>
+                <div><span className="text-[#666]">背景：</span><span className="text-white">{result.staging.background}</span></div>
+                <div><span className="text-[#666]">照明：</span><span className="text-white">{result.staging.lighting}</span></div>
+                <div><span className="text-[#666]">小道具：</span><span className="text-white">{result.staging.props}</span></div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">キャプション</div>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{result.caption}</p>
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">キャプション</div>
+              <p className="text-sm text-white leading-relaxed whitespace-pre-wrap">{result.caption}</p>
               <div className="flex flex-wrap gap-1 mt-3">
                 {result.hashtags.map((h, i) => (
-                  <span key={i} className="bg-gray-100 text-gray-600 text-xs rounded px-2 py-0.5">
+                  <span key={i} className="bg-[#2a2a2a] text-[#aaa] text-xs rounded px-2 py-0.5">
                     #{h.replace('#', '')}
                   </span>
                 ))}
@@ -335,7 +339,7 @@ function DashboardPage() {
 
         {history.length > 0 && (
           <div>
-            <h2 className="text-sm font-bold text-gray-700 mb-3">過去の台本</h2>
+            <h2 className="text-sm font-bold text-[#666] mb-3">過去の台本</h2>
             <div className="space-y-2">
               {history.map((h) => (
                 <button
@@ -345,13 +349,13 @@ function DashboardPage() {
                     setSelectedHistory(h)
                     window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
-                  className={`w-full text-left bg-white border rounded-xl p-4 hover:border-gray-400 transition ${
-                    selectedHistory?.id === h.id ? 'border-gray-900' : 'border-gray-200'
+                  className={`w-full text-left bg-[#1a1a1a] border rounded-xl p-4 transition-colors ${
+                    selectedHistory?.id === h.id ? 'border-white' : 'border-[#2a2a2a] hover:border-[#444]'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-1 gap-2">
-                    <span className="font-medium text-sm truncate">{h.theme}</span>
-                    <span className="text-xs text-gray-400 shrink-0">
+                    <span className="font-medium text-sm text-white truncate">{h.theme}</span>
+                    <span className="text-xs text-[#555] shrink-0">
                       {new Date(h.created_at).toLocaleDateString('ja-JP', {
                         month: 'short',
                         day: 'numeric',
@@ -360,7 +364,7 @@ function DashboardPage() {
                       })}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-[#666]">
                     {h.genre} ・ {h.target} ・ {h.duration} ・ {h.mood}
                   </div>
                 </button>
@@ -372,7 +376,7 @@ function DashboardPage() {
         <footer className="mt-12 pb-6 text-center">
           <button
             onClick={() => router.push('/feedback')}
-            className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2"
+            className="text-xs text-[#444] hover:text-[#888] underline underline-offset-2 transition-colors"
           >
             フィードバックを送る
           </button>
@@ -384,7 +388,7 @@ function DashboardPage() {
 
 export default function DashboardWrapper() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-500">読み込み中...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center"><p className="text-[#555]">読み込み中...</p></div>}>
       <DashboardPage />
     </Suspense>
   )
