@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAuthClient } from '@/lib/usage'
 import { createAdminClient } from '@/lib/supabase-admin'
 
 const ADMIN_EMAIL = 'rikicoco0709@gmail.com'
@@ -16,17 +15,7 @@ function topN(values: (string | null)[], n: number) {
 }
 
 export async function GET(request: NextRequest) {
-  // 1. ユーザー認証
-  const token = request.headers.get('authorization')?.replace('Bearer ', '')
-  if (!token) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
-
-  const userClient = createAuthClient(token)
-  const { data: { user } } = await userClient.auth.getUser()
-  if (!user || user.email !== ADMIN_EMAIL) {
-    return NextResponse.json({ error: 'アクセス権限がありません' }, { status: 403 })
-  }
-
-  // 2. サービスロールクライアント（RLSをバイパス）
+  // 1. サービスロールクライアントを生成
   let admin: ReturnType<typeof createAdminClient>
   try {
     admin = createAdminClient()
@@ -34,6 +23,15 @@ export async function GET(request: NextRequest) {
     const message = e instanceof Error ? e.message : 'サービスロールキーの設定エラー'
     console.error('[admin/stats]', message)
     return NextResponse.json({ error: message }, { status: 500 })
+  }
+
+  // 2. トークンからユーザーを取得して管理者チェック
+  const token = request.headers.get('authorization')?.replace('Bearer ', '')
+  if (!token) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
+
+  const { data: { user } } = await admin.auth.getUser(token)
+  if (!user || user.email !== ADMIN_EMAIL) {
+    return NextResponse.json({ error: 'アクセス権限がありません' }, { status: 403 })
   }
 
   // 3. データ取得
