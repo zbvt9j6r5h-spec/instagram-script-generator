@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
-import { LineContactButton } from '@/components/LineContactButton'
 
 type ScriptResult = {
   hook: string
@@ -100,6 +99,7 @@ function DashboardPage() {
 
     setGenerating(true)
     setResult(null)
+    setSelectedHistory(null)
 
     try {
       const { data: { session } } = await supabase.auth.getSession()
@@ -172,8 +172,9 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f]">
+      {/* ヘッダー */}
       <header className="bg-black border-b border-[#1a1a1a]">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <h1 className="text-lg font-bold text-white">撮影台本ジェネレーター</h1>
           <div className="flex items-center gap-3 sm:gap-4">
             <span className="text-sm text-[#555] hidden sm:block">{user?.email}</span>
@@ -184,7 +185,8 @@ function DashboardPage() {
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-2 bg-[#0f0f0f]">
+      {/* タブナビ */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2">
         <div className="flex border-b border-[#2a2a2a] overflow-x-auto">
           <button className="px-4 py-3 text-sm font-bold text-white border-b-2 border-white shrink-0 whitespace-nowrap min-h-[44px]">
             台本生成
@@ -204,198 +206,213 @@ function DashboardPage() {
         </div>
       </div>
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6 mb-6">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-[#999] mb-1">アカウントのジャンル</label>
-              <input
-                type="text"
-                value={genre}
-                onChange={(e) => setGenre(e.target.value)}
-                placeholder="例：料理、コーチング、美容サロン"
-                className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-base sm:text-sm text-white placeholder:text-[#555] focus:outline-none focus:border-[#444]"
-              />
-            </div>
+      {/* メインコンテンツ：2カラム */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
 
-            <div>
-              <label className="block text-sm text-[#999] mb-1">ターゲット</label>
-              <input
-                type="text"
-                value={target}
-                onChange={(e) => setTarget(e.target.value)}
-                placeholder="例：30代の主婦、副業したい会社員"
-                className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-base sm:text-sm text-white placeholder:text-[#555] focus:outline-none focus:border-[#444]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-[#999] mb-1">今週伝えたいテーマ</label>
-              <input
-                type="text"
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
-                placeholder="例：簡単に作れる朝食レシピ"
-                className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-base sm:text-sm text-white placeholder:text-[#555] focus:outline-none focus:border-[#444]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm text-[#999] mb-2">動画の長さ</label>
-              <div className="flex gap-2">
-                {durations.map((d) => (
-                  <button
-                    key={d}
-                    onClick={() => setDuration(d)}
-                    className={`px-4 py-2 rounded-full text-sm border transition-colors ${
-                      duration === d
-                        ? 'bg-white text-black border-white'
-                        : 'bg-transparent text-[#666] border-[#2a2a2a] hover:border-[#444] hover:text-white'
-                    }`}
-                  >
-                    {d}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm text-[#999] mb-2">雰囲気</label>
-              <div className="flex flex-wrap gap-2">
-                {moods.map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => setMood(m)}
-                    className={`px-4 py-2 rounded-full text-sm border transition-colors ${
-                      mood === m
-                        ? 'bg-white text-black border-white'
-                        : 'bg-transparent text-[#666] border-[#2a2a2a] hover:border-[#444] hover:text-white'
-                    }`}
-                  >
-                    {m}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {remainingUsage !== null && (
-              <p className="text-xs text-[#555] text-right">今月の残り回数：{remainingUsage} / 3回</p>
-            )}
-
-            <button
-              onClick={handleGenerate}
-              disabled={generating || remainingUsage === 0}
-              className="w-full bg-white text-black py-3 rounded-lg font-medium hover:bg-gray-100 disabled:opacity-30 transition-colors"
-            >
-              {generating ? '生成中...' : '台本を生成する'}
-            </button>
-
-            {remainingUsage === 0 && <UsageLimitCard />}
-
-            {error && (
-              <div className="bg-[#1f0000] border border-[#3a0000] text-red-400 text-sm rounded-lg p-3">{error}</div>
-            )}
-          </div>
-        </div>
-
-        {result && (
-          <div className="space-y-4 mb-12">
-            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
-              <div className="text-xs text-[#555] uppercase tracking-wider mb-2">つかみ</div>
-              <div className="text-lg font-bold text-white">&ldquo;{result.hook}&rdquo;</div>
-            </div>
-
-            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
-              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">動画構成</div>
-              {result.structure.map((s, i) => (
-                <div key={i} className="flex flex-col sm:grid sm:grid-cols-[80px_1fr_1fr] gap-0.5 sm:gap-2 text-sm py-2 border-b border-[#2a2a2a] last:border-0">
-                  <span className="text-[#555] text-xs sm:text-sm">{s.time}</span>
-                  <span className="text-[#aaa]">{s.action}</span>
-                  <span className="text-white">{s.line}</span>
+          {/* 左カラム：フォーム＋生成結果 */}
+          <main className="min-w-0">
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6 mb-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-[#999] mb-1">アカウントのジャンル</label>
+                  <input
+                    type="text"
+                    value={genre}
+                    onChange={(e) => setGenre(e.target.value)}
+                    placeholder="例：料理、コーチング、美容サロン"
+                    className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-base sm:text-sm text-white placeholder:text-[#555] focus:outline-none focus:border-[#444]"
+                  />
                 </div>
-              ))}
-            </div>
 
-            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
-              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">カメラ指示</div>
-              <div className="space-y-2 text-sm">
-                <div><span className="text-[#666]">アングル：</span><span className="text-white">{result.camera.angle}</span></div>
-                <div><span className="text-[#666]">位置・距離：</span><span className="text-white">{result.camera.position}</span></div>
-                <div><span className="text-[#666]">動き：</span><span className="text-white">{result.camera.movement}</span></div>
-              </div>
-            </div>
+                <div>
+                  <label className="block text-sm text-[#999] mb-1">ターゲット</label>
+                  <input
+                    type="text"
+                    value={target}
+                    onChange={(e) => setTarget(e.target.value)}
+                    placeholder="例：30代の主婦、副業したい会社員"
+                    className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-base sm:text-sm text-white placeholder:text-[#555] focus:outline-none focus:border-[#444]"
+                  />
+                </div>
 
-            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
-              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">セッティング</div>
-              <div className="space-y-2 text-sm">
-                <div><span className="text-[#666]">背景：</span><span className="text-white">{result.staging.background}</span></div>
-                <div><span className="text-[#666]">照明：</span><span className="text-white">{result.staging.lighting}</span></div>
-                <div><span className="text-[#666]">小道具：</span><span className="text-white">{result.staging.props}</span></div>
-              </div>
-            </div>
+                <div>
+                  <label className="block text-sm text-[#999] mb-1">今週伝えたいテーマ</label>
+                  <input
+                    type="text"
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value)}
+                    placeholder="例：簡単に作れる朝食レシピ"
+                    className="w-full bg-[#111] border border-[#2a2a2a] rounded-lg px-3 py-2.5 text-base sm:text-sm text-white placeholder:text-[#555] focus:outline-none focus:border-[#444]"
+                  />
+                </div>
 
-            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
-              <div className="text-xs text-[#555] uppercase tracking-wider mb-3">キャプション</div>
-              <p className="text-sm text-white leading-relaxed whitespace-pre-wrap">{result.caption}</p>
-              <div className="flex flex-wrap gap-1 mt-3">
-                {result.hashtags.map((h, i) => (
-                  <span key={i} className="bg-[#2a2a2a] text-[#aaa] text-xs rounded px-2 py-0.5">
-                    #{h.replace('#', '')}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+                <div>
+                  <label className="block text-sm text-[#999] mb-2">動画の長さ</label>
+                  <div className="flex gap-2">
+                    {durations.map((d) => (
+                      <button
+                        key={d}
+                        onClick={() => setDuration(d)}
+                        className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                          duration === d
+                            ? 'bg-white text-black border-white'
+                            : 'bg-transparent text-[#666] border-[#2a2a2a] hover:border-[#444] hover:text-white'
+                        }`}
+                      >
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-        {history.length > 0 && (
-          <div>
-            <h2 className="text-sm font-bold text-[#666] mb-3">過去の台本</h2>
-            <div className="space-y-2">
-              {history.map((h) => (
+                <div>
+                  <label className="block text-sm text-[#999] mb-2">雰囲気</label>
+                  <div className="flex flex-wrap gap-2">
+                    {moods.map((m) => (
+                      <button
+                        key={m}
+                        onClick={() => setMood(m)}
+                        className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                          mood === m
+                            ? 'bg-white text-black border-white'
+                            : 'bg-transparent text-[#666] border-[#2a2a2a] hover:border-[#444] hover:text-white'
+                        }`}
+                      >
+                        {m}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {remainingUsage !== null && (
+                  <p className="text-xs text-[#555] text-right">今月の残り回数：{remainingUsage} / 3回</p>
+                )}
+
                 <button
-                  key={h.id}
-                  onClick={() => {
-                    setResult(h.result)
-                    setSelectedHistory(h)
-                    window.scrollTo({ top: 0, behavior: 'smooth' })
-                  }}
-                  className={`w-full text-left bg-[#1a1a1a] border rounded-xl p-4 transition-colors ${
-                    selectedHistory?.id === h.id ? 'border-white' : 'border-[#2a2a2a] hover:border-[#444]'
-                  }`}
+                  onClick={handleGenerate}
+                  disabled={generating || remainingUsage === 0}
+                  className="w-full bg-white text-black py-3 rounded-lg font-medium hover:bg-gray-100 disabled:opacity-30 transition-colors"
                 >
-                  <div className="flex justify-between items-start mb-1 gap-2">
-                    <span className="font-medium text-sm text-white truncate">{h.theme}</span>
-                    <span className="text-xs text-[#555] shrink-0">
-                      {new Date(h.created_at).toLocaleDateString('ja-JP', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  </div>
-                  <div className="text-xs text-[#666]">
-                    {h.genre} ・ {h.target} ・ {h.duration} ・ {h.mood}
-                  </div>
+                  {generating ? '生成中...' : '台本を生成する'}
                 </button>
-              ))}
+
+                {remainingUsage === 0 && <UsageLimitCard />}
+
+                {error && (
+                  <div className="bg-[#1f0000] border border-[#3a0000] text-red-400 text-sm rounded-lg p-3">{error}</div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
 
-        <footer className="mt-12 pb-6 text-center">
-          <button
-            onClick={() => router.push('/feedback')}
-            className="text-xs text-[#444] hover:text-[#888] underline underline-offset-2 transition-colors"
-          >
-            フィードバックを送る
-          </button>
-        </footer>
-      </main>
+            {result && (
+              <div className="space-y-4">
+                <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+                  <div className="text-xs text-[#555] uppercase tracking-wider mb-2">つかみ</div>
+                  <div className="text-lg font-bold text-white">&ldquo;{result.hook}&rdquo;</div>
+                </div>
 
-      <LineContactButton />
+                <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+                  <div className="text-xs text-[#555] uppercase tracking-wider mb-3">動画構成</div>
+                  {result.structure.map((s, i) => (
+                    <div key={i} className="flex flex-col sm:grid sm:grid-cols-[80px_1fr_1fr] gap-0.5 sm:gap-2 text-sm py-2 border-b border-[#2a2a2a] last:border-0">
+                      <span className="text-[#555] text-xs sm:text-sm">{s.time}</span>
+                      <span className="text-[#aaa]">{s.action}</span>
+                      <span className="text-white">{s.line}</span>
+                    </div>
+                  ))}
+                </div>
 
+                <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+                  <div className="text-xs text-[#555] uppercase tracking-wider mb-3">カメラ指示</div>
+                  <div className="space-y-2 text-sm">
+                    <div><span className="text-[#666]">アングル：</span><span className="text-white">{result.camera.angle}</span></div>
+                    <div><span className="text-[#666]">位置・距離：</span><span className="text-white">{result.camera.position}</span></div>
+                    <div><span className="text-[#666]">動き：</span><span className="text-white">{result.camera.movement}</span></div>
+                  </div>
+                </div>
+
+                <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+                  <div className="text-xs text-[#555] uppercase tracking-wider mb-3">セッティング</div>
+                  <div className="space-y-2 text-sm">
+                    <div><span className="text-[#666]">背景：</span><span className="text-white">{result.staging.background}</span></div>
+                    <div><span className="text-[#666]">照明：</span><span className="text-white">{result.staging.lighting}</span></div>
+                    <div><span className="text-[#666]">小道具：</span><span className="text-white">{result.staging.props}</span></div>
+                  </div>
+                </div>
+
+                <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-6">
+                  <div className="text-xs text-[#555] uppercase tracking-wider mb-3">キャプション</div>
+                  <p className="text-sm text-white leading-relaxed whitespace-pre-wrap">{result.caption}</p>
+                  <div className="flex flex-wrap gap-1 mt-3">
+                    {result.hashtags.map((h, i) => (
+                      <span key={i} className="bg-[#2a2a2a] text-[#aaa] text-xs rounded px-2 py-0.5">
+                        #{h.replace('#', '')}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <footer className="mt-10 pb-6 text-center">
+              <button
+                onClick={() => router.push('/feedback')}
+                className="text-xs text-[#444] hover:text-[#888] underline underline-offset-2 transition-colors"
+              >
+                フィードバックを送る
+              </button>
+            </footer>
+          </main>
+
+          {/* 右カラム：生成履歴サイドバー */}
+          <aside className="lg:sticky lg:top-6 lg:self-start">
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-bold text-white">生成履歴</h2>
+                {history.length > 0 && (
+                  <span className="text-xs text-[#555] bg-[#2a2a2a] rounded-full px-2 py-0.5">{history.length}件</span>
+                )}
+              </div>
+              {history.length === 0 ? (
+                <p className="text-xs text-[#555] text-center py-6">まだ台本がありません</p>
+              ) : (
+                <div className="space-y-1.5 max-h-[70vh] overflow-y-auto pr-1">
+                  {history.map((h) => (
+                    <button
+                      key={h.id}
+                      onClick={() => {
+                        setResult(h.result)
+                        setSelectedHistory(h)
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }}
+                      className={`w-full text-left rounded-xl px-3 py-2.5 transition-colors border ${
+                        selectedHistory?.id === h.id
+                          ? 'border-white bg-[#2a2a2a]'
+                          : 'border-transparent hover:bg-[#222] hover:border-[#333]'
+                      }`}
+                    >
+                      <p className="text-sm text-white truncate leading-snug">{h.theme}</p>
+                      <p className="text-xs text-[#555] mt-0.5 truncate">{h.genre} · {h.target}</p>
+                      <p className="text-xs text-[#444] mt-0.5">
+                        {new Date(h.created_at).toLocaleDateString('ja-JP', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </aside>
+
+        </div>
+      </div>
+
+      {/* フィードバックモーダル */}
       {showFeedbackModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
