@@ -2,7 +2,7 @@ import { createHmac } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
 
-const REPLY_TEXT = `ありがとうございます！🙏
+const REPLY_RESET_OK = `ありがとうございます！🙏
 
 確認しました✅
 
@@ -14,6 +14,13 @@ instagram-script-generator-tau.vercel.app
 
 何かご不明な点があれば
 お気軽にメッセージしてください😊`
+
+const REPLY_ALREADY_RESET = `申し訳ありません🙏
+
+今月はすでにリセット済みです。
+リセットは月1回までとなっております。
+
+来月またご利用ください📅`
 
 function verifySignature(rawBody: string, signature: string): boolean {
   const secret = process.env.LINE_CHANNEL_SECRET
@@ -71,9 +78,14 @@ export async function POST(request: NextRequest) {
         .eq('line_user_id', lineUserId)
         .single()
 
-      if (lookupError || !lineUser?.supabase_user_id) {
+      if (lookupError) {
+        // テーブルやカラムが存在しない場合もここに来る
+        console.error(`[line-webhook] lookup error for ${lineUserId}:`, lookupError)
+        continue
+      }
+
+      if (!lineUser?.supabase_user_id) {
         console.warn(`[line-webhook] line_user not found: ${lineUserId}`)
-        await replyMessage(replyToken, REPLY_TEXT)
         continue
       }
 
@@ -83,18 +95,17 @@ export async function POST(request: NextRequest) {
 
       if (lineUser.last_reset_at && new Date(lineUser.last_reset_at) >= startOfMonth) {
         console.log(`[line-webhook] already reset this month: ${lineUserId}`)
-        await replyMessage(replyToken,
-          `申し訳ありません🙏\n\n今月はすでにリセット済みです。\nリセットは月1回までとなっております。\n\n来月またご利用ください📅`
-        )
+        await replyMessage(replyToken, REPLY_ALREADY_RESET)
         continue
       }
 
       // 今月のusage_logsを全削除（利用回数をリセット）
+      const startOfMonthISO = startOfMonth.toISOString()
       const { error: deleteError } = await admin
         .from('usage_logs')
         .delete()
         .eq('user_id', lineUser.supabase_user_id)
-        .gte('created_at', startOfMonth.toISOString())
+        .gte('created_at', startOfMonthISO)
 
       if (deleteError) {
         console.error('[line-webhook] usage_logs削除エラー:', deleteError)
@@ -110,9 +121,11 @@ export async function POST(request: NextRequest) {
 
       if (updateError) {
         console.error('[line-webhook] last_reset_at更新エラー:', updateError)
+      } else {
+        console.log(`[line-webhook] last_reset_at updated: ${lineUserId}`)
       }
 
-      await replyMessage(replyToken, REPLY_TEXT)
+      await replyMessage(replyToken, REPLY_RESET_OK)
     }
   }
 
