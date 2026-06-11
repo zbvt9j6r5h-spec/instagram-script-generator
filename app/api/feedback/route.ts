@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase-admin'
-import { createAuthClient } from '@/lib/usage'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,17 +14,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'メッセージを入力してください' }, { status: 400 })
     }
 
-    // ログイン中ならユーザーIDを取得（任意）
+    // ログイン中ならトークンからユーザーIDを取得（任意）
     let userId: string | null = null
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     if (token) {
-      const userClient = createAuthClient(token)
-      const { data: { user } } = await userClient.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser(token)
       userId = user?.id ?? null
     }
 
-    const admin = createAdminClient()
-    const { error } = await admin.from('feedback').insert({
+    const { error } = await supabase.from('feedback').insert({
       user_id: userId,
       rating: rating ?? null,
       category: category || null,
