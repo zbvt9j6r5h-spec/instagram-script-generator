@@ -38,7 +38,7 @@ export default function LandingPage() {
               href="https://lin.ee/9VIHcYZ"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-8 py-4 rounded-full transition-colors border border-white/20"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#06C755] hover:bg-[#05b34c] text-white font-semibold text-sm px-8 py-4 rounded-full transition-colors"
             >
               <LineIcon />
               LINE登録で使い方を受け取る
@@ -257,7 +257,7 @@ export default function LandingPage() {
               href="https://lin.ee/9VIHcYZ"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-8 py-4 rounded-full transition-colors border border-white/20"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#06C755] hover:bg-[#05b34c] text-white font-semibold text-sm px-8 py-4 rounded-full transition-colors"
             >
               <LineIcon />
               LINEで使い方ガイドを受け取る

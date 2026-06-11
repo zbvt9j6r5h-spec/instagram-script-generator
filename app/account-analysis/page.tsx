@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
+import { LineContactButton } from '@/components/LineContactButton'
 type MonthlyWeek = {
   week: number
   theme: string
@@ -374,6 +375,7 @@ export default function AccountAnalysisPage() {
         )}
       </main>
 
+      <LineContactButton />
     </div>
   )
 }

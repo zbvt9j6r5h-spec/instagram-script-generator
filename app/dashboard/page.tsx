@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
+import { LineContactButton } from '@/components/LineContactButton'
 
 type ScriptResult = {
   hook: string
@@ -460,6 +461,8 @@ function DashboardPage() {
           </div>
         </div>
       )}
+
+      <LineContactButton />
     </div>
   )
 }
