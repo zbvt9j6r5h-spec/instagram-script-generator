@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
+import { LineContactButton } from '@/components/LineContactButton'
 
 type ScriptResult = {
   hook: string
@@ -42,6 +43,7 @@ function DashboardPage() {
   const [history, setHistory] = useState<ScriptHistory[]>([])
   const [selectedHistory, setSelectedHistory] = useState<ScriptHistory | null>(null)
   const [remainingUsage, setRemainingUsage] = useState<number | null>(null)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
 
   useEffect(() => {
     const checkUser = async () => {
@@ -135,6 +137,19 @@ function DashboardPage() {
           .limit(20)
 
         if (scripts) setHistory(scripts)
+
+        // 今月の生成回数が3の倍数ならフィードバックモーダルを表示
+        const now = new Date()
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+        const { count: monthlyCount } = await supabase
+          .from('usage_logs')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('feature', 'generate-script')
+          .gte('created_at', startOfMonth.toISOString())
+        if (monthlyCount && monthlyCount % 3 === 0) {
+          setShowFeedbackModal(true)
+        }
       }
     } catch (e) {
       const message = e instanceof Error ? e.message : 'エラーが発生しました'
@@ -378,6 +393,45 @@ function DashboardPage() {
           </button>
         </footer>
       </main>
+
+      <LineContactButton />
+
+      {showFeedbackModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowFeedbackModal(false)}
+        >
+          <div className="absolute inset-0 bg-black/70" />
+          <div
+            className="relative bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 max-w-sm w-full space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-base font-bold text-white">ご利用ありがとうございます！🙏</h2>
+            <p className="text-sm text-[#aaa] leading-relaxed">
+              使い心地はいかがですか？<br />
+              ご意見・ご感想をLINEで教えていただけると<br />
+              サービス改善に役立てます😊
+            </p>
+            <div className="flex flex-col gap-2">
+              <a
+                href="https://lin.ee/WhGkd90"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setShowFeedbackModal(false)}
+                className="flex items-center justify-center gap-2 w-full bg-[#06C755] hover:bg-[#05b34c] text-white text-sm font-semibold py-3 rounded-lg transition-colors"
+              >
+                💬 LINEでフィードバックを送る
+              </a>
+              <button
+                onClick={() => setShowFeedbackModal(false)}
+                className="w-full text-sm text-[#666] hover:text-[#aaa] py-2 transition-colors"
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

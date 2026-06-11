@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
+import { LineContactButton } from '@/components/LineContactButton'
 
 type AnalysisResult = {
   summary: string
@@ -505,6 +506,8 @@ export default function AnalyzePage() {
           </div>
         )}
       </main>
+
+      <LineContactButton />
     </div>
   )
 }
