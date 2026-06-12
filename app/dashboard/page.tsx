@@ -287,8 +287,21 @@ function DashboardPage() {
                   </div>
                 </div>
 
-                {remainingUsage !== null && (
+                {remainingUsage !== null && remainingUsage > 1 && (
                   <p className="text-xs text-[#555] text-right">今月の残り回数：{remainingUsage} / 3回</p>
+                )}
+                {remainingUsage === 1 && (
+                  <div className="flex items-center justify-between bg-[#1a0a00] border border-[#3a2000] rounded-lg px-3 py-2.5">
+                    <p className="text-xs text-orange-400">今月残り<span className="font-bold">1回</span>です。LINE登録で無料リセット🎁</p>
+                    <a
+                      href="https://lin.ee/WhGkd90"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-3 shrink-0 bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
+                    >
+                      登録
+                    </a>
+                  </div>
                 )}
 
                 <button
@@ -408,6 +421,20 @@ function DashboardPage() {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* 欲しい機能募集カード */}
+            <div className="mt-3 bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-4 space-y-2">
+              <p className="text-xs font-bold text-white">💡 欲しい機能、教えてください</p>
+              <p className="text-xs text-[#777] leading-relaxed">「こんな機能があったら使いやすい」という声をもとに改善しています。LINEで気軽に送ってください。</p>
+              <a
+                href="https://lin.ee/WhGkd90"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 w-full bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-semibold py-2 rounded-lg transition-colors"
+              >
+                💬 LINEで要望を送る
+              </a>
             </div>
           </aside>
 
