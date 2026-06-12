@@ -381,7 +381,21 @@ function DashboardPage() {
           </main>
 
           {/* 右カラム：生成履歴サイドバー */}
-          <aside className="lg:sticky lg:top-6 lg:self-start">
+          <aside className="lg:sticky lg:top-6 lg:self-start space-y-3">
+            {/* 欲しい機能募集カード */}
+            <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-4 space-y-2">
+              <p className="text-xs font-bold text-white">💡 欲しい機能、教えてください</p>
+              <p className="text-xs text-[#777] leading-relaxed">「こんな機能があったら使いやすい」という声をもとに改善しています。LINEで気軽に送ってください。</p>
+              <a
+                href="https://lin.ee/WhGkd90"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 w-full bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-semibold py-2 rounded-lg transition-colors"
+              >
+                💬 LINEで要望を送る
+              </a>
+            </div>
+
             <div className="bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-4">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-bold text-white">生成履歴</h2>
@@ -421,20 +435,6 @@ function DashboardPage() {
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* 欲しい機能募集カード */}
-            <div className="mt-3 bg-[#1a1a1a] rounded-2xl border border-[#2a2a2a] p-4 space-y-2">
-              <p className="text-xs font-bold text-white">💡 欲しい機能、教えてください</p>
-              <p className="text-xs text-[#777] leading-relaxed">「こんな機能があったら使いやすい」という声をもとに改善しています。LINEで気軽に送ってください。</p>
-              <a
-                href="https://lin.ee/WhGkd90"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 w-full bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-semibold py-2 rounded-lg transition-colors"
-              >
-                💬 LINEで要望を送る
-              </a>
             </div>
           </aside>
 
