@@ -18,7 +18,9 @@ if (fs.existsSync(envPath)) {
 }
 
 const { createClient } = require('@supabase/supabase-js')
+const { TwitterApi } = require('twitter-api-v2')
 const NOTION_PAGE_ID = 'a0709720e775456d94725b3f5b64f8f2'
+const X_USERNAME = 'nana_1250_'
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -42,6 +44,29 @@ function countBy(arr, key) {
     map[v] = (map[v] || 0) + 1
   })
   return Object.entries(map).sort((a, b) => b[1] - a[1])
+}
+
+async function collectXData() {
+  try {
+    const client = new TwitterApi({
+      appKey: process.env.X_API_KEY,
+      appSecret: process.env.X_API_KEY_SECRET,
+      accessToken: process.env.X_ACCESS_TOKEN,
+      accessSecret: process.env.X_ACCESS_TOKEN_SECRET,
+    })
+    const user = await client.v2.userByUsername(X_USERNAME, {
+      'user.fields': ['public_metrics'],
+    })
+    const m = user.data.public_metrics
+    return {
+      followers: m.followers_count,
+      following: m.following_count,
+      tweetCount: m.tweet_count,
+    }
+  } catch (e) {
+    console.warn('⚠️  X データ取得失敗:', e.message)
+    return null
+  }
 }
 
 async function collectData() {
@@ -92,6 +117,8 @@ async function collectData() {
     .select('*', { count: 'exact', head: true })
     .gte('created_at', startOfMonth)
 
+  const xData = await collectXData()
+
   return {
     monthlyScripts: monthlyScripts ?? 0,
     prevScripts: prevScripts ?? 0,
@@ -101,6 +128,9 @@ async function collectData() {
     topTargets,
     totalLine: totalLine ?? 0,
     newLine: newLine ?? 0,
+    xFollowers: xData?.followers ?? null,
+    xFollowing: xData?.following ?? null,
+    xTweetCount: xData?.tweetCount ?? null,
   }
 }
 
@@ -138,7 +168,7 @@ async function createReport(data) {
   const scriptsDiff = diff(data.monthlyScripts, data.prevScripts)
 
   const blocks = [
-    callout(`${monthLabel}のレポートです。Instagram・X の数値は手動で入力してください。アプリ・LINE は自動集計済みです。`, '📊', 'yellow_background'),
+    callout(`${monthLabel}のレポートです。X・LINE・アプリは自動集計済みです。Instagram のみ手動入力してください。`, '📊', 'yellow_background'),
     div(),
 
     // Instagram
@@ -165,14 +195,17 @@ async function createReport(data) {
     blank('最もリーチした投稿'),
     div(),
 
-    // X
+    // X（自動）
     h2('🐦 X（Twitter）'),
-    callout('X Analytics（analytics.twitter.com）から確認できます', '✏️', 'gray_background'),
-    blank('フォロワー総数'),
-    blank('今月の新規フォロワー'),
-    blank('インプレッション合計'),
-    blank('プロフィールアクセス数'),
-    blank('今月の投稿数'),
+    ...(data.xFollowers !== null ? [
+      row('フォロワー数', `${data.xFollowers.toLocaleString()} 人`),
+      row('フォロー数', `${data.xFollowing.toLocaleString()} 人`),
+      row('累計ツイート数', `${data.xTweetCount.toLocaleString()} 件`),
+      blank('今月の新規フォロワー'),
+      blank('今月のインプレッション合計'),
+    ] : [
+      callout('X データの取得に失敗しました。APIキーを確認してください。', '⚠️', 'red_background'),
+    ]),
     div(),
 
     // LINE（自動）
@@ -235,6 +268,9 @@ async function createReport(data) {
   console.log(`  台本生成（今月）: ${data.monthlyScripts} 回`)
   console.log(`  LINE友だち総数: ${data.totalLine} 人`)
   console.log(`  LINE新規登録（今月）: ${data.newLine} 人`)
+  if (data.xFollowers !== null) {
+    console.log(`  Xフォロワー数: ${data.xFollowers.toLocaleString()} 人`)
+  }
   if (data.topGenres.length > 0) {
     console.log(`  人気ジャンル1位: ${data.topGenres[0][0]} (${data.topGenres[0][1]}回)`)
   }
@@ -243,5 +279,5 @@ async function createReport(data) {
 
   console.log(`\n✅ Notionにレポートを作成しました`)
   console.log(`🔗 ${url}\n`)
-  console.log('Instagram・X の数値はNotionページを開いて手動で入力してください。\n')
+  console.log('Instagram の数値だけNotionページを開いて手動入力してください。\n')
 })()
