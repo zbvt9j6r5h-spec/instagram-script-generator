@@ -53,16 +53,6 @@ function DashboardPage() {
         return
       }
 
-      const { data: allowed } = await supabase
-        .from('allowed_users')
-        .select('id')
-        .eq('email', user.email)
-        .maybeSingle()
-      if (!allowed) {
-        router.push('/unauthorized')
-        return
-      }
-
       setUser(user)
       setLoading(false)
 
