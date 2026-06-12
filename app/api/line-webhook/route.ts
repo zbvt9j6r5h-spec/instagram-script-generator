@@ -43,38 +43,29 @@ async function replyMessage(replyToken: string, text: string): Promise<void> {
   })
 }
 
-const REPLY_WELCOME = `友だち追加ありがとうございます！🎉
+async function getLineProfile(userId: string): Promise<string> {
+  const res = await fetch(`https://api.line.me/v2/bot/profile/${userId}`, {
+    headers: { Authorization: `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}` },
+  })
+  if (!res.ok) return ''
+  const data = await res.json()
+  return data.displayName ?? ''
+}
 
-InstaScript AIへようこそ✨
+function buildWelcomeMessage(displayName: string): string {
+  return `${displayName}さん、ようこそ！🎉
 
-━━━━━━━━━━━━━━
-📱 InstaScript AIとは？
-━━━━━━━━━━━━━━
-Instagramのリール台本を
-AIが自動生成するツールです。
+登録ありがとうございます。
 
-ジャンル・ターゲット・テーマを入れるだけで
-・つかみ（冒頭セリフ）
-・動画構成・カメラ指示
-・キャプション＆ハッシュタグ
+目的に合わせてどうぞ👇
 
-が数秒で完成します📝
+📱 ツールを使いたい方
+→ instagram-script-generator-tau.vercel.app
 
-━━━━━━━━━━━━━━
-🎁 無料で使える
-━━━━━━━━━━━━━━
-毎月3回まで無料でお使いいただけます。
-回数を使い切ったらこのLINEに
-「追加希望」と送ってください。
-無料でリセットします！
-
-━━━━━━━━━━━━━━
-▼ さっそく使ってみる
-instagram-script-generator-tau.vercel.app
-━━━━━━━━━━━━━━
-
-何かご不明な点はいつでも
-このLINEにメッセージしてください😊`
+🚀 さらなるAIツールを使いたい方・
+　AIで業務を効率化したい方
+→「自動化」と送ってください`
+}
 
 export async function POST(request: NextRequest) {
   const rawBody = await request.text()
@@ -97,13 +88,14 @@ export async function POST(request: NextRequest) {
 
     // 友だち追加イベント
     if (event.type === 'follow') {
+      const displayName = await getLineProfile(lineUserId)
       const admin = createAdminClient()
       await admin.from('line_users').upsert(
-        { line_user_id: lineUserId },
-        { onConflict: 'line_user_id', ignoreDuplicates: true }
+        { line_user_id: lineUserId, display_name: displayName || null },
+        { onConflict: 'line_user_id' }
       )
-      console.log(`[line-webhook] follow: ${lineUserId}`)
-      await replyMessage(event.replyToken, REPLY_WELCOME)
+      console.log(`[line-webhook] follow: ${lineUserId} name="${displayName}"`)
+      await replyMessage(event.replyToken, buildWelcomeMessage(displayName || ''))
       continue
     }
 
