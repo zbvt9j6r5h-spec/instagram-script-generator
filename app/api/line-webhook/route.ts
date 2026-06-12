@@ -43,6 +43,39 @@ async function replyMessage(replyToken: string, text: string): Promise<void> {
   })
 }
 
+const REPLY_WELCOME = `友だち追加ありがとうございます！🎉
+
+InstaScript AIへようこそ✨
+
+━━━━━━━━━━━━━━
+📱 InstaScript AIとは？
+━━━━━━━━━━━━━━
+Instagramのリール台本を
+AIが自動生成するツールです。
+
+ジャンル・ターゲット・テーマを入れるだけで
+・つかみ（冒頭セリフ）
+・動画構成・カメラ指示
+・キャプション＆ハッシュタグ
+
+が数秒で完成します📝
+
+━━━━━━━━━━━━━━
+🎁 無料で使える
+━━━━━━━━━━━━━━
+毎月3回まで無料でお使いいただけます。
+回数を使い切ったらこのLINEに
+「追加希望」と送ってください。
+無料でリセットします！
+
+━━━━━━━━━━━━━━
+▼ さっそく使ってみる
+instagram-script-generator-tau.vercel.app
+━━━━━━━━━━━━━━
+
+何かご不明な点はいつでも
+このLINEにメッセージしてください😊`
+
 export async function POST(request: NextRequest) {
   const rawBody = await request.text()
   const signature = request.headers.get('x-line-signature') ?? ''
@@ -60,9 +93,22 @@ export async function POST(request: NextRequest) {
   }
 
   for (const event of body.events ?? []) {
+    const lineUserId = event.source.userId
+
+    // 友だち追加イベント
+    if (event.type === 'follow') {
+      const admin = createAdminClient()
+      await admin.from('line_users').upsert(
+        { line_user_id: lineUserId },
+        { onConflict: 'line_user_id', ignoreDuplicates: true }
+      )
+      console.log(`[line-webhook] follow: ${lineUserId}`)
+      await replyMessage(event.replyToken, REPLY_WELCOME)
+      continue
+    }
+
     if (event.type !== 'message' || event.message.type !== 'text') continue
 
-    const lineUserId = event.source.userId
     const text = event.message.text.trim()
     const replyToken = event.replyToken
 
@@ -138,4 +184,5 @@ type LineEvent = {
   replyToken: string
   source: { userId: string; type: string }
   message: { type: string; text: string }
+  timestamp: number
 }
