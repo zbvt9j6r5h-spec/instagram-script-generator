@@ -294,6 +294,12 @@ export default function AnalyzePage() {
           >
             アカウント分析
           </button>
+          <button
+            onClick={() => router.push('/learning')}
+            className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
+          >
+            学びログ
+          </button>
         </div>
       </div>
 
