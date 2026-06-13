@@ -31,13 +31,8 @@ function extractText(content: Anthropic.Messages.ContentBlock[]): string {
     .join('')
 }
 
-function splitMessages(full: string): [string, string, string] {
-  const parts = full.split('===SPLIT===')
-  return [
-    (parts[0] ?? full).trim(),
-    (parts[1] ?? '').trim(),
-    (parts[2] ?? '').trim(),
-  ]
+function buildLineMessage(dateLabel: string, url: string): string {
+  return `今日の学び 📚 ${dateLabel}\n${url}`
 }
 
 export async function GET(request: NextRequest) {
@@ -208,19 +203,14 @@ export async function GET(request: NextRequest) {
     ? rawText.slice(rawText.indexOf('【今日の学び】'))
     : rawText
 
-  const [msg1, msg2, msg3] = splitMessages(fullText)
-
   // ISO日付（YYYY-MM-DD）
   const isoDate = `${jstDate.getUTCFullYear()}-${String(jstDate.getUTCMonth() + 1).padStart(2, '0')}-${String(jstDate.getUTCDate()).padStart(2, '0')}`
   const visualUrl = `https://instagram-script-generator-tau.vercel.app/daily/${isoDate}`
 
-  // 3件目のメッセージにURLを追記
-  const urlNote = `\n\n↓ 図解で見る\n${visualUrl}`
-  const msgs = [msg1, msg2, msg3].filter(m => m.length > 0)
-  if (msgs.length > 0) msgs[msgs.length - 1] += urlNote
-
-  await pushLineMessages(msgs)
-  console.log(`[daily-knowledge] LINE送信完了 ${dateLabel} / ${msgs.length}件`)
+  // LINEにはURLのみ送信
+  const lineMsg = buildLineMessage(dateLabel, visualUrl)
+  await pushLineMessages([lineMsg])
+  console.log(`[daily-knowledge] LINE送信完了 ${dateLabel}`)
 
   // Supabaseに保存
   try {
@@ -247,5 +237,5 @@ export async function GET(request: NextRequest) {
   const saved = await saveLearningToNotion(fullText, isoDate)
   console.log(`[daily-knowledge] Notion保存完了 ${saved}件`)
 
-  return NextResponse.json({ ok: true, date: dateLabel, parts: msgs.length, notionSaved: saved, visualUrl })
+  return NextResponse.json({ ok: true, date: dateLabel, notionSaved: saved, visualUrl })
 }

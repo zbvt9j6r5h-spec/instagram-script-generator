@@ -218,21 +218,10 @@ function parseKnowledge(fullText, dateStr) {
   const rawText = response.content.filter(b => b.type === 'text').map(b => b.text).join('')
   const fullText = rawText.includes('【今日の学び】') ? rawText.slice(rawText.indexOf('【今日の学び】')) : rawText
 
-  const parts = fullText.split('===SPLIT===')
-  const msgs = parts.map(p => p.trim()).filter(p => p.length > 0)
-
-  console.log(`📝 ${msgs.length}件のメッセージを生成\n`)
-  msgs.forEach((m, i) => {
-    console.log(`--- メッセージ ${i+1} (${m.length}文字) ---`)
-    console.log(m.slice(0, 150) + (m.length > 150 ? '...' : ''))
-    console.log()
-  })
-
-  // 最後のメッセージにURLを追記
-  if (msgs.length > 0) msgs[msgs.length - 1] += `\n\n↓ 図解で見る\n${visualUrl}`
-
-  console.log('📤 LINEに送信中...')
-  await pushLineMessages(msgs)
+  // LINEにはURLのみ送信
+  const lineMsg = `今日の学び 📚 ${dateLabel}\n${visualUrl}`
+  console.log(`📤 LINEに送信中...\n${lineMsg}\n`)
+  await pushLineMessages([lineMsg])
 
   // Supabaseに保存
   console.log('💾 Supabaseに保存中...')
