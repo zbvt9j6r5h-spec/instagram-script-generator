@@ -54,28 +54,28 @@ self.addEventListener('fetch', event => {
   )
 })
 
-// プッシュ通知受信
-self.addEventListener('push', event => {
-  const data = event.data?.json() ?? {}
-  const title = data.title ?? 'InstaScript AI'
-  const options = {
-    body: data.body ?? '新しい通知があります',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
-    data: { url: data.url ?? '/dashboard' },
-  }
-  event.waitUntil(self.registration.showNotification(title, options))
-})
+// プッシュ通知（一時的に無効化）
+// self.addEventListener('push', event => {
+//   const data = event.data?.json() ?? {}
+//   const title = data.title ?? 'InstaScript AI'
+//   const options = {
+//     body: data.body ?? '新しい通知があります',
+//     icon: '/icons/icon-192.png',
+//     badge: '/icons/icon-192.png',
+//     data: { url: data.url ?? '/dashboard' },
+//   }
+//   event.waitUntil(self.registration.showNotification(title, options))
+// })
 
-// 通知クリック → 対象ページを開く
-self.addEventListener('notificationclick', event => {
-  event.notification.close()
-  const url = event.notification.data?.url ?? '/dashboard'
-  event.waitUntil(
-    clients.matchAll({ type: 'window' }).then(ws => {
-      const existing = ws.find(w => w.url.includes(url))
-      if (existing) return existing.focus()
-      return clients.openWindow(url)
-    })
-  )
-})
+// 通知クリック（一時的に無効化）
+// self.addEventListener('notificationclick', event => {
+//   event.notification.close()
+//   const url = event.notification.data?.url ?? '/dashboard'
+//   event.waitUntil(
+//     clients.matchAll({ type: 'window' }).then(ws => {
+//       const existing = ws.find(w => w.url.includes(url))
+//       if (existing) return existing.focus()
+//       return clients.openWindow(url)
+//     })
+//   )
+// })
