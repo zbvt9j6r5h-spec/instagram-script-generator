@@ -15,7 +15,6 @@ type Stats = {
   topThemes: { name: string; count: number }[]
   recentScripts: { genre: string; target: string; theme: string; created_at: string }[]
 }
-
 export default function AdminPage() {
   const router = useRouter()
   const [stats, setStats] = useState<Stats | null>(null)
