@@ -1,9 +1,22 @@
-import Anthropic from '@anthropic-ai/sdk'
-import { NextRequest, NextResponse } from 'next/server'
+#!/usr/bin/env node
+/**
+ * daily-knowledge の動作テスト
+ * 使い方: node scripts/test-daily-knowledge.js
+ */
 
+const fs = require('fs'), path = require('path')
+const envPath = path.resolve('.env.local')
+if (fs.existsSync(envPath)) {
+  fs.readFileSync(envPath, 'utf-8').split('\n').forEach(line => {
+    const m = line.match(/^([^#=]+)=(.*)/)
+    if (m) process.env[m[1].trim()] = m[2].trim()
+  })
+}
+
+const Anthropic = require('@anthropic-ai/sdk').default
 const LINE_USER_ID = 'U3ec2ceaf46873f225d09848605779388'
 
-async function pushLineMessages(texts: string[]): Promise<void> {
+async function pushLineMessages(texts) {
   const res = await fetch('https://api.line.me/v2/bot/message/push', {
     method: 'POST',
     headers: {
@@ -15,39 +28,34 @@ async function pushLineMessages(texts: string[]): Promise<void> {
       messages: texts.map(text => ({ type: 'text', text })),
     }),
   })
-  if (!res.ok) {
-    const body = await res.text()
-    throw new Error(`LINE push failed: ${res.status} ${body}`)
-  }
+  const body = await res.json()
+  if (!res.ok) throw new Error(`LINE push failed: ${res.status} ${JSON.stringify(body)}`)
+  console.log('✅ LINE送信成功')
 }
 
-function extractText(content: Anthropic.Messages.ContentBlock[]): string {
+function extractText(content) {
   return content
-    .filter((b): b is Anthropic.Messages.TextBlock => b.type === 'text')
+    .filter(b => b.type === 'text')
     .map(b => b.text)
     .join('')
 }
 
-function splitMessages(full: string): [string, string, string] {
+function splitMessages(full) {
   const parts = full.split('===SPLIT===')
   return [
     (parts[0] ?? full).trim(),
     (parts[1] ?? '').trim(),
     (parts[2] ?? '').trim(),
-  ]
+  ].filter(m => m.length > 0)
 }
 
-export async function GET(request: NextRequest) {
-  // Vercel cronはAuthorizationヘッダーでCRON_SECRETを送る
-  const auth = request.headers.get('authorization')
-  if (process.env.CRON_SECRET && auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+;(async () => {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-  const jstDate = new Date(Date.now() + 9 * 60 * 60 * 1000)
-  const dateLabel = `${jstDate.getUTCFullYear()}年${String(jstDate.getUTCMonth() + 1).padStart(2, '0')}月${String(jstDate.getUTCDate()).padStart(2, '0')}日`
+  const now = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const dateLabel = `${now.getUTCFullYear()}年${String(now.getUTCMonth() + 1).padStart(2, '0')}月${String(now.getUTCDate()).padStart(2, '0')}日`
+
+  console.log(`\n🔍 ${dateLabel} の学習コンテンツを生成中（web検索あり）...\n`)
 
   const prompt = `あなたは世界中の最新情報をリサーチして、日本の起業家・Instagramクリエイターに毎日学びを届けるAIアシスタントです。
 
@@ -59,7 +67,6 @@ export async function GET(request: NextRequest) {
 - 具体的な数字・データを必ず入れる
 - 「海外では〇〇、日本ではまだ〇〇」という比較視点を入れる
 - 今すぐ実践できるアクションを入れる
-- 文字数を守る（全体で約4500文字以内）
 
 【検索クエリ（実際に検索すること）】
 - "Instagram Reels algorithm update 2026"
@@ -182,34 +189,31 @@ export async function GET(request: NextRequest) {
     {
       model: 'claude-sonnet-4-6',
       max_tokens: 4000,
-      tools: [
-        {
-          type: 'web_search_20250305' as 'web_search_20250305',
-          name: 'web_search',
-        },
-      ],
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
       messages: [{ role: 'user', content: prompt }],
     },
-    {
-      headers: { 'anthropic-beta': 'web-search-2025-03-05' },
-    }
+    { headers: { 'anthropic-beta': 'web-search-2025-03-05' } }
   )
 
-  const rawText = extractText(response.content)
-  if (!rawText) {
-    throw new Error('Claude からテキストが取得できませんでした')
-  }
+  const fullText = extractText(response.content)
+  if (!fullText) throw new Error('テキストが取得できませんでした')
 
   // 冒頭の不要なテキストを除去（【今日の学び】より前を削除）
-  const fullText = rawText.includes('【今日の学び】')
-    ? rawText.slice(rawText.indexOf('【今日の学び】'))
-    : rawText
+  const cleaned = fullText.includes('【今日の学び】')
+    ? fullText.slice(fullText.indexOf('【今日の学び】'))
+    : fullText
 
-  const [msg1, msg2, msg3] = splitMessages(fullText)
+  const messages = splitMessages(cleaned)
+  console.log(`📝 ${messages.length}件のメッセージを生成\n`)
+  messages.forEach((m, i) => {
+    console.log(`--- メッセージ ${i + 1} (${m.length}文字) ---`)
+    console.log(m.slice(0, 200) + (m.length > 200 ? '...' : ''))
+    console.log()
+  })
 
-  const messages = [msg1, msg2, msg3].filter(m => m.length > 0)
+  console.log('📤 LINEに送信中...')
   await pushLineMessages(messages)
-
-  console.log(`[daily-knowledge] 送信完了 ${dateLabel} / ${messages.length}件`)
-  return NextResponse.json({ ok: true, date: dateLabel, parts: messages.length })
-}
+})().catch(e => {
+  console.error('❌ エラー:', e.message)
+  process.exit(1)
+})
