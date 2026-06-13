@@ -6,17 +6,19 @@ type Plan = 'ライト' | 'スタンダード' | 'プレミアム'
 
 const PLANS: Array<{
   name: Plan
+  originalPrice: string
   price: string
-  priceNote: string
   recommended?: boolean
+  slots: number
   features: string[]
   color: string
   accent: string
 }> = [
   {
     name: 'ライト',
+    originalPrice: '¥200,000',
     price: '¥100,000',
-    priceNote: '税込',
+    slots: 3,
     color: '#2a2a2a',
     accent: '#888',
     features: [
@@ -28,9 +30,10 @@ const PLANS: Array<{
   },
   {
     name: 'スタンダード',
+    originalPrice: '¥300,000',
     price: '¥150,000',
-    priceNote: '税込',
     recommended: true,
+    slots: 2,
     color: '#6366F1',
     accent: '#6366F1',
     features: [
@@ -44,8 +47,9 @@ const PLANS: Array<{
   },
   {
     name: 'プレミアム',
+    originalPrice: '¥400,000',
     price: '¥200,000',
-    priceNote: '税込',
+    slots: 1,
     color: '#F59E0B',
     accent: '#F59E0B',
     features: [
@@ -178,11 +182,23 @@ export default function CoursePage() {
 
               <div className={`p-6 flex-1 flex flex-col ${plan.recommended ? 'pt-10' : ''}`}
                 style={{ background: plan.recommended ? `${plan.color}10` : '#111' }}>
-                <p className="text-sm font-bold mb-2" style={{ color: plan.accent }}>{plan.name}プラン</p>
+                <p className="text-sm font-bold mb-3" style={{ color: plan.accent }}>{plan.name}プラン</p>
+                <div className="inline-flex items-center gap-2 mb-2">
+                  <span className="bg-red-500 text-white text-xs font-black rounded-full px-3 py-1">モニター限定50%OFF</span>
+                </div>
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="text-xl text-red-400 line-through">{plan.originalPrice}</span>
+                </div>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-4xl font-black text-white">{plan.price}</span>
+                  <span className="text-xs text-[#777]">税込 / 3ヶ月</span>
                 </div>
-                <p className="text-xs text-[#555] mb-6">{plan.priceNote} / 3ヶ月</p>
+                <div className="flex items-center gap-3 mb-6">
+                  <p className="text-xs text-red-400 font-bold">今だけ期間限定価格</p>
+                  <p className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#1a1a1a] border border-red-400/40 text-red-300">
+                    残り{plan.slots}名
+                  </p>
+                </div>
 
                 <ul className="space-y-2.5 flex-1 mb-6">
                   {plan.features.map((f, i) => (
