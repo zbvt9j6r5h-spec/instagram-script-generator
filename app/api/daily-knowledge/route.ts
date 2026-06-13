@@ -1,6 +1,8 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
 import { saveLearningToNotion } from '@/lib/notion-learning'
+import { parseKnowledgeText } from '@/lib/parse-knowledge'
+import { createAdminClient } from '@/lib/supabase-admin'
 
 const LINE_USER_ID = 'U3ec2ceaf46873f225d09848605779388'
 
@@ -208,14 +210,42 @@ export async function GET(request: NextRequest) {
 
   const [msg1, msg2, msg3] = splitMessages(fullText)
 
-  const messages = [msg1, msg2, msg3].filter(m => m.length > 0)
-  await pushLineMessages(messages)
-  console.log(`[daily-knowledge] LINE送信完了 ${dateLabel} / ${messages.length}件`)
-
   // ISO日付（YYYY-MM-DD）
   const isoDate = `${jstDate.getUTCFullYear()}-${String(jstDate.getUTCMonth() + 1).padStart(2, '0')}-${String(jstDate.getUTCDate()).padStart(2, '0')}`
+  const visualUrl = `https://instagram-script-generator-tau.vercel.app/daily/${isoDate}`
+
+  // 3件目のメッセージにURLを追記
+  const urlNote = `\n\n↓ 図解で見る\n${visualUrl}`
+  const msgs = [msg1, msg2, msg3].filter(m => m.length > 0)
+  if (msgs.length > 0) msgs[msgs.length - 1] += urlNote
+
+  await pushLineMessages(msgs)
+  console.log(`[daily-knowledge] LINE送信完了 ${dateLabel} / ${msgs.length}件`)
+
+  // Supabaseに保存
+  try {
+    const parsed = parseKnowledgeText(fullText)
+    const admin = createAdminClient()
+    await admin.from('daily_knowledge').upsert({
+      date: isoDate,
+      instagram: parsed.instagram,
+      business: parsed.business,
+      course: parsed.course,
+      ai_tech: parsed.ai_tech,
+      marketing: parsed.marketing,
+      mindset: parsed.mindset,
+      key_task: parsed.key_task,
+      quote: parsed.quote,
+      quote_author: parsed.quote_author,
+    }, { onConflict: 'date' })
+    console.log(`[daily-knowledge] Supabase保存完了 ${isoDate}`)
+  } catch (e) {
+    console.error('[daily-knowledge] Supabase保存エラー:', e)
+  }
+
+  // Notionにも保存
   const saved = await saveLearningToNotion(fullText, isoDate)
   console.log(`[daily-knowledge] Notion保存完了 ${saved}件`)
 
-  return NextResponse.json({ ok: true, date: dateLabel, parts: messages.length, notionSaved: saved })
+  return NextResponse.json({ ok: true, date: dateLabel, parts: msgs.length, notionSaved: saved, visualUrl })
 }
