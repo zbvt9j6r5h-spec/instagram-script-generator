@@ -44,6 +44,47 @@ function DashboardPage() {
   const [selectedHistory, setSelectedHistory] = useState<ScriptHistory | null>(null)
   const [remainingUsage, setRemainingUsage] = useState<number | null>(null)
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [showInstallBanner, setShowInstallBanner] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+
+  // PWAインストールプロンプトの検出
+  useEffect(() => {
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !('MSStream' in window)
+    setIsIOS(ios)
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    if (isStandalone) return
+
+    if (localStorage.getItem('pwa-install-dismissed')) return
+
+    if (ios) {
+      const timer = setTimeout(() => setShowInstallBanner(true), 3000)
+      return () => clearTimeout(timer)
+    }
+
+    const handler = (e: Event) => {
+      e.preventDefault()
+      setDeferredPrompt(e)
+      setShowInstallBanner(true)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return
+    deferredPrompt.prompt()
+    await deferredPrompt.userChoice
+    setDeferredPrompt(null)
+    setShowInstallBanner(false)
+  }
+
+  const handleDismissInstall = () => {
+    setShowInstallBanner(false)
+    localStorage.setItem('pwa-install-dismissed', '1')
+  }
 
   useEffect(() => {
     const checkUser = async () => {
@@ -174,6 +215,43 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f]">
+
+      {/* PWAインストールバナー（固定・画面下） */}
+      {showInstallBanner && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#1a1a1a] border-t border-[#2a2a2a] px-4 py-3 flex items-center justify-between gap-3 safe-area-inset-bottom">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icons/icon-192.png" alt="" className="w-10 h-10 rounded-xl shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-white">ホーム画面に追加</p>
+              {isIOS ? (
+                <p className="text-xs text-[#666] mt-0.5 leading-snug">
+                  Shareボタン → 「ホーム画面に追加」をタップ
+                </p>
+              ) : (
+                <p className="text-xs text-[#666] mt-0.5">アプリとしてインストールできます</p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {!isIOS && deferredPrompt && (
+              <button
+                onClick={handleInstall}
+                className="bg-[#6366F1] hover:bg-[#4f46e5] text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors"
+              >
+                追加する
+              </button>
+            )}
+            <button
+              onClick={handleDismissInstall}
+              className="text-[#555] hover:text-white text-xs px-2 py-2 transition-colors"
+            >
+              後で
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ヘッダー */}
       <header className="bg-black border-b border-[#1a1a1a]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
