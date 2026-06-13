@@ -3,6 +3,14 @@
     {
       "path": "/api/daily-knowledge",
       "schedule": "0 21 * * *"
+    },
+    {
+      "path": "/api/weekly-summary",
+      "schedule": "0 22 * * 0"
+    },
+    {
+      "path": "/api/monthly-mindmap",
+      "schedule": "0 23 1 * *"
     }
   ]
 }

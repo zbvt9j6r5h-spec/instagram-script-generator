@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
+import { saveLearningToNotion } from '@/lib/notion-learning'
 
 const LINE_USER_ID = 'U3ec2ceaf46873f225d09848605779388'
 
@@ -209,7 +210,12 @@ export async function GET(request: NextRequest) {
 
   const messages = [msg1, msg2, msg3].filter(m => m.length > 0)
   await pushLineMessages(messages)
+  console.log(`[daily-knowledge] LINE送信完了 ${dateLabel} / ${messages.length}件`)
 
-  console.log(`[daily-knowledge] 送信完了 ${dateLabel} / ${messages.length}件`)
-  return NextResponse.json({ ok: true, date: dateLabel, parts: messages.length })
+  // ISO日付（YYYY-MM-DD）
+  const isoDate = `${jstDate.getUTCFullYear()}-${String(jstDate.getUTCMonth() + 1).padStart(2, '0')}-${String(jstDate.getUTCDate()).padStart(2, '0')}`
+  const saved = await saveLearningToNotion(fullText, isoDate)
+  console.log(`[daily-knowledge] Notion保存完了 ${saved}件`)
+
+  return NextResponse.json({ ok: true, date: dateLabel, parts: messages.length, notionSaved: saved })
 }
