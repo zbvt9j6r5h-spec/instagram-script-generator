@@ -1,8 +1,10 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 type Plan = 'ライト' | 'スタンダード' | 'プレミアム'
+
+const DEADLINE = new Date('2026-06-28T23:59:59+09:00')
 
 const PLANS: Array<{
   name: Plan
@@ -85,22 +87,28 @@ const TESTIMONIALS = [
   {
     name: 'Aさん（30代・会社員）',
     plan: 'スタンダード',
+    stars: 5,
     before: 'フォロワー180人・週7時間投稿作業',
     after: '3ヶ月でフォロワー4,800人。LINEからコンサル申込みが月5件。会社員しながらでも全然まわせる。',
+    result: 'フォロワー+4,620人・月収+8万円',
     color: '#6366F1',
   },
   {
     name: 'Bさん（20代・フリーランス）',
     plan: 'プレミアム',
+    stars: 5,
     before: '何を投稿すればいいかわからず月10投稿が限界',
     after: '台本はAIが全部作ってくれるので週4投稿が普通に継続できた。2ヶ月目に収益化の仕組みが完成。',
+    result: '月10投稿→週4投稿達成・収益化2ヶ月で完成',
     color: '#F59E0B',
   },
   {
     name: 'Cさん（40代・主婦）',
     plan: 'ライト',
+    stars: 5,
     before: 'Instagram初心者。スマホ一台で副業を始めたかった',
     after: '3ヶ月でフォロワー2,100人。今は月3万円の副収入。ゼロからでも全然できた。',
+    result: 'フォロワー0→2,100人・月収+3万円',
     color: '#10B981',
   },
 ]
@@ -193,6 +201,21 @@ const AI_FEATURES = [
   },
 ]
 
+const INSTRUCTOR = {
+  name: 'りっきー',
+  title: 'Instagram × AI マーケティングコンサルタント',
+  followers: '2.3万',
+  clients: '100名以上',
+  period: '6ヶ月',
+  achievements: [
+    { icon: '📈', text: 'フォロワー0→23,000人を6ヶ月で達成' },
+    { icon: '🤖', text: 'AI活用でコンテンツ制作時間を90%削減' },
+    { icon: '💰', text: 'コンサル生の73%が3ヶ月以内に収益化達成' },
+    { icon: '🏢', text: '法人向けSNSマーケティング支援実績あり' },
+  ],
+  bio: '会社員時代にInstagramを独学でゼロから始め、6ヶ月でフォロワー2.3万人・副業月収7桁を達成。その後AIとInstagramを組み合わせた独自メソッドを確立し、現在は受講生100名以上をサポート。「遠回りさせない最短ルート」を届けることに全力を注いでいる。',
+}
+
 const FAQS = [
   {
     q: 'Instagram初心者でも大丈夫ですか？',
@@ -224,8 +247,75 @@ const FAQS = [
   },
 ]
 
+function CountdownBox({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="bg-[#111] border border-[#2a2a2a] rounded-xl w-14 h-14 flex items-center justify-center">
+        <span className="text-2xl font-black text-white tabular-nums">
+          {String(value).padStart(2, '0')}
+        </span>
+      </div>
+      <span className="text-[10px] text-[#555] mt-1">{label}</span>
+    </div>
+  )
+}
+
+const LINE_URL = 'https://lin.ee/WhGkd90'
+
+function GroupConsultCTA({ variant = 'section' }: { variant?: 'section' | 'compact' }) {
+  if (variant === 'compact') {
+    return (
+      <div className="max-w-3xl mx-auto px-5 mb-12">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#06C755]/8 border border-[#06C755]/25 rounded-2xl px-6 py-5">
+          <div>
+            <p className="text-xs font-bold text-[#4ade80] uppercase tracking-wider mb-1">毎月開催 · 参加者限定グルコン</p>
+            <p className="text-sm text-[#ddd] leading-relaxed">
+              個別コンサルはまだ迷う…という方は、まず「グルコン」で運用のリアルを体験してみませんか？<br className="hidden sm:block" />
+              開催日程はLINE登録者限定でご案内しています。
+            </p>
+          </div>
+          <a
+            href={LINE_URL}
+            className="shrink-0 inline-flex items-center gap-2 bg-[#06C755] hover:bg-[#05b34c] text-white font-black px-6 py-3 rounded-xl text-sm transition-all whitespace-nowrap"
+          >
+            LINEで日程を受け取る →
+          </a>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <section className="border-y border-[#1a1a1a] bg-[#081a10]">
+      <div className="max-w-3xl mx-auto px-5 py-14 sm:py-16 text-center">
+        <div className="inline-flex items-center gap-2 text-xs font-bold text-[#4ade80] uppercase tracking-[0.15em] bg-[#06C755]/10 border border-[#06C755]/30 rounded-full px-4 py-1.5 mb-6">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80] animate-pulse" />
+          毎月開催 · グループコンサル（グルコン）
+        </div>
+        <h2 className="text-xl sm:text-2xl font-black mb-4 leading-relaxed">
+          いきなり個別コンサルは不安な方へ。<br />
+          まずは「グルコン」に参加してみませんか？
+        </h2>
+        <p className="text-[#999] text-sm leading-relaxed mb-8 max-w-lg mx-auto">
+          月1回開催のグループコンサルでは、AIを使った台本作成・アカウント運用のリアルな進め方をその場で学べます。
+          <span className="text-white font-bold">初回は無料でご参加いただけます。</span><br />
+          開催日程・参加リンクはLINE登録者限定でお送りしています。
+        </p>
+        <a
+          href={LINE_URL}
+          className="inline-flex items-center justify-center gap-2 bg-[#06C755] hover:bg-[#05b34c] text-white font-black px-8 py-4 rounded-2xl text-base transition-all shadow-lg shadow-[#06C755]/20 hover:scale-[1.02]"
+        >
+          LINEでグルコンの日程を受け取る →
+        </a>
+        <p className="text-[#4a4a4a] text-xs mt-4">友だち追加後、次回開催日をすぐにお送りします</p>
+      </div>
+    </section>
+  )
+}
+
 export default function CoursePage() {
   const formRef = useRef<HTMLDivElement>(null)
+  const heroRef = useRef<HTMLDivElement>(null)
   const [selectedPlan, setSelectedPlan] = useState<Plan>('スタンダード')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -234,6 +324,36 @@ export default function CoursePage() {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [showStickyBar, setShowStickyBar] = useState(false)
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+
+  useEffect(() => {
+    function handleScroll() {
+      const heroBottom = heroRef.current?.getBoundingClientRect().bottom ?? 0
+      setShowStickyBar(heroBottom < 0)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    function tick() {
+      const diff = DEADLINE.getTime() - Date.now()
+      if (diff <= 0) {
+        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+        return
+      }
+      setCountdown({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      })
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [])
 
   function scrollToForm() {
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -274,59 +394,91 @@ export default function CoursePage() {
     <div className="min-h-screen bg-[#0f0f0f] text-white">
 
       {/* ① ヒーロー */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a3e] via-[#0f0f0f] to-[#0f0f0f]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-[#6366F1] opacity-[0.07] rounded-full blur-3xl pointer-events-none" />
+      <section ref={heroRef} className="relative overflow-hidden">
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #0d0d2b 0%, #0f0f0f 50%, #0f0f1a 100%)' }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[900px] bg-[#6366F1] opacity-[0.08] rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-20 left-[10%] w-[300px] h-[300px] bg-[#E1306C] opacity-[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-[5%] w-[400px] h-[400px] bg-[#10B981] opacity-[0.04] rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative max-w-3xl mx-auto px-5 py-20 sm:py-28 text-center">
-          <p className="inline-block text-xs font-bold text-[#a78bfa] uppercase tracking-[0.2em] bg-[#6366F1]/10 border border-[#6366F1]/30 rounded-full px-4 py-1.5 mb-6">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-[#a78bfa] uppercase tracking-[0.15em] bg-[#6366F1]/10 border border-[#6366F1]/30 rounded-full px-4 py-1.5 mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#a78bfa] animate-pulse" />
             モニター募集中 · 残り6名限定
-          </p>
-          <h1 className="text-3xl sm:text-5xl font-black leading-tight mb-6">
-            AIでInstagramを<br />
-            <span style={{ background: 'linear-gradient(90deg, #6366F1, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              完全自動化する
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl font-black leading-[1.15] mb-6 tracking-tight">
+            頑張って投稿しているのに<br />
+            <span className="relative inline-block mt-2">
+              <span style={{ background: 'linear-gradient(90deg, #6366F1, #a78bfa, #E1306C)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                なぜ伸びないのか
+              </span>
             </span>
-            <br />3ヶ月コンサル
+            <span className="block text-white mt-2">
+              その答えと解決策を、<br className="sm:hidden" />3ヶ月で手に入れる。
+            </span>
           </h1>
-          <p className="text-[#aaa] text-base sm:text-lg leading-relaxed mb-4 max-w-xl mx-auto">
-            台本・キャプション・投稿分析まで、AIが全部やる仕組みを構築。<br />
-            <span className="text-white font-bold">副業会社員でも、1日1時間で週4投稿が継続できる</span>体制を3ヶ月で作ります。
+
+          <p className="text-[#999] text-base sm:text-lg leading-relaxed mb-8 max-w-xl mx-auto">
+            AIが台本・分析・投稿カレンダーを全自動で作る仕組みを構築。<br />
+            <span className="text-white font-bold">副業会社員でも、1日1時間で週4投稿が継続できる体制</span>を、
+            一緒に3ヶ月で完成させます。
           </p>
-          <div className="flex flex-wrap justify-center gap-3 mb-10 text-sm">
-            {['平均フォロワー+3,200人 / 3ヶ月', '投稿作業時間 −80%', '受講生満足度 97%'].map(t => (
-              <span key={t} className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-full px-4 py-1.5 text-[#aaa]">
+
+          {/* 実績バッジ */}
+          <div className="flex flex-wrap justify-center gap-2.5 mb-10 text-sm">
+            {['受講生 100名以上', '平均フォロワー+3,200人 / 3ヶ月', '満足度 97%'].map(t => (
+              <span key={t} className="bg-[#ffffff08] backdrop-blur-sm border border-[#ffffff12] rounded-full px-4 py-1.5 text-[#bbb] text-xs">
                 ✓ {t}
               </span>
             ))}
           </div>
+
+          {/* カウントダウン */}
+          <div className="mb-10">
+            <p className="text-xs text-red-400 font-bold mb-3 tracking-wider uppercase">モニター価格 終了まで</p>
+            <div className="flex justify-center items-center gap-3">
+              <CountdownBox value={countdown.days} label="日" />
+              <span className="text-[#333] text-2xl font-black pb-5">:</span>
+              <CountdownBox value={countdown.hours} label="時間" />
+              <span className="text-[#333] text-2xl font-black pb-5">:</span>
+              <CountdownBox value={countdown.minutes} label="分" />
+              <span className="text-[#333] text-2xl font-black pb-5">:</span>
+              <CountdownBox value={countdown.seconds} label="秒" />
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={scrollToForm}
-              className="inline-flex items-center justify-center gap-2 bg-[#6366F1] hover:bg-[#4f46e5] text-white font-bold px-8 py-4 rounded-2xl text-base transition-colors"
+              className="group inline-flex items-center justify-center gap-2 text-white font-black px-10 py-4 rounded-2xl text-base transition-all shadow-lg shadow-[#6366F1]/30 hover:shadow-[#6366F1]/50 hover:scale-[1.02]"
+              style={{ background: 'linear-gradient(135deg, #6366F1, #8b5cf6)' }}
             >
-              今すぐ申し込む →
+              今すぐ申し込む
+              <span className="group-hover:translate-x-1 transition-transform">→</span>
             </button>
-            <button
-              onClick={scrollToForm}
-              className="inline-flex items-center justify-center gap-2 bg-transparent border border-[#2a2a2a] text-[#aaa] hover:text-white font-bold px-8 py-4 rounded-2xl text-base transition-colors"
+            <a
+              href={LINE_URL}
+              className="inline-flex items-center justify-center gap-2 bg-transparent border border-[#2a2a2a] hover:border-[#444] text-[#999] hover:text-white font-bold px-8 py-4 rounded-2xl text-base transition-all"
             >
-              まず相談する
-            </button>
+              まず LINE で相談する
+            </a>
           </div>
-          <p className="text-[#555] text-xs mt-4">申込み後、3営業日以内にご連絡します</p>
+          <p className="text-[#444] text-xs mt-4">申込み後、3営業日以内にご連絡します · 無料相談あり</p>
         </div>
       </section>
 
+      {/* ①.5 グルコンCTA（独立セクション） */}
+      <GroupConsultCTA />
+
       {/* ② 実績数字 */}
-      <section className="border-y border-[#1a1a1a] bg-[#0a0a0a]">
+      <section className="border-y border-[#1a1a1a] bg-[#080808]">
         <div className="max-w-4xl mx-auto px-5 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {RESULTS.map(r => (
               <div key={r.label} className="text-center">
                 <p className="text-3xl sm:text-4xl font-black mb-1" style={{ color: r.color }}>{r.value}</p>
-                <p className="text-xs text-[#777] mb-0.5">{r.period}</p>
-                <p className="text-xs text-[#555]">{r.label}</p>
+                <p className="text-xs text-[#555] mb-0.5">{r.period}</p>
+                <p className="text-xs text-[#444]">{r.label}</p>
               </div>
             ))}
           </div>
@@ -335,16 +487,17 @@ export default function CoursePage() {
 
       {/* ③ こんな悩みはありませんか */}
       <section className="max-w-4xl mx-auto px-5 py-16 sm:py-20">
+        <p className="text-xs font-bold text-[#6366F1] text-center uppercase tracking-widest mb-3">あなただけじゃない</p>
         <h2 className="text-2xl sm:text-3xl font-black text-center mb-3">こんな悩みはありませんか？</h2>
-        <p className="text-[#555] text-center text-sm mb-10">このプログラムはこれらをすべて解決します</p>
+        <p className="text-[#444] text-center text-sm mb-10">このプログラムはこれらをすべて解決します</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {FOR_WHO.map((item, i) => (
-            <div key={i} className="bg-[#111] rounded-2xl p-6 border border-[#1a1a1a]">
+            <div key={i} className="bg-[#0d0d0d] rounded-2xl p-6 border border-[#1a1a1a] hover:border-[#2a2a2a] transition-colors">
               <div className="flex items-start gap-4">
                 <span className="text-3xl shrink-0">{item.emoji}</span>
                 <div>
                   <p className="text-sm font-black text-white mb-2">{item.title}</p>
-                  <p className="text-xs text-[#777] leading-relaxed">{item.desc}</p>
+                  <p className="text-xs text-[#666] leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             </div>
@@ -352,22 +505,75 @@ export default function CoursePage() {
         </div>
       </section>
 
-      {/* ④ InstaScript AI とは */}
-      <section className="bg-[#111] border-y border-[#1a1a1a]">
+      {/* ④ 講師プロフィール */}
+      <section className="bg-[#0a0a0a] border-y border-[#1a1a1a]">
+        <div className="max-w-3xl mx-auto px-5 py-16 sm:py-20">
+          <p className="text-xs font-bold text-[#6366F1] text-center uppercase tracking-widest mb-3">Who</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-center mb-10">誰が教えるのか</h2>
+
+          <div className="flex flex-col sm:flex-row gap-8 items-start">
+            {/* アバター */}
+            <div className="shrink-0 mx-auto sm:mx-0">
+              <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-4xl font-black text-white shadow-lg"
+                style={{ background: 'linear-gradient(135deg, #6366F1, #a78bfa)' }}>
+                R
+              </div>
+              <div className="mt-3 text-center">
+                <p className="text-white font-black text-base">{INSTRUCTOR.name}</p>
+                <p className="text-[#555] text-xs mt-0.5">{INSTRUCTOR.title}</p>
+              </div>
+            </div>
+
+            <div className="flex-1">
+              {/* 実績数字 */}
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                <div className="bg-[#111] rounded-xl p-3 text-center border border-[#1a1a1a]">
+                  <p className="text-xl font-black text-[#6366F1]">{INSTRUCTOR.followers}</p>
+                  <p className="text-[10px] text-[#555] mt-0.5">フォロワー数</p>
+                </div>
+                <div className="bg-[#111] rounded-xl p-3 text-center border border-[#1a1a1a]">
+                  <p className="text-xl font-black text-[#10B981]">{INSTRUCTOR.clients}</p>
+                  <p className="text-[10px] text-[#555] mt-0.5">サポート実績</p>
+                </div>
+                <div className="bg-[#111] rounded-xl p-3 text-center border border-[#1a1a1a]">
+                  <p className="text-xl font-black text-[#F59E0B]">{INSTRUCTOR.period}</p>
+                  <p className="text-[10px] text-[#555] mt-0.5">0→2.3万人達成</p>
+                </div>
+              </div>
+
+              {/* bio */}
+              <p className="text-sm text-[#888] leading-relaxed mb-5">{INSTRUCTOR.bio}</p>
+
+              {/* 実績リスト */}
+              <ul className="space-y-2">
+                {INSTRUCTOR.achievements.map((a, i) => (
+                  <li key={i} className="flex items-center gap-2.5 text-sm text-[#ccc]">
+                    <span className="text-base">{a.icon}</span>
+                    {a.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ⑤ InstaScript AI とは */}
+      <section className="border-b border-[#1a1a1a]">
         <div className="max-w-4xl mx-auto px-5 py-16">
           <p className="text-xs font-bold text-[#6366F1] text-center uppercase tracking-widest mb-3">受講生専用ツール</p>
           <h2 className="text-2xl sm:text-3xl font-black text-center mb-3">InstaScript AI とは</h2>
-          <p className="text-[#777] text-center text-sm mb-10 max-w-xl mx-auto">
-            このコンサルでは、受講生全員にAIツール「InstaScript AI」を3ヶ月間無制限で提供します。<br />
-            投稿作業のほとんどをAIが代行するため、あなたは「戦略と撮影」だけに集中できます。
+          <p className="text-[#555] text-center text-sm mb-10 max-w-xl mx-auto">
+            受講生全員に3ヶ月間無制限で提供。投稿作業のほとんどをAIが代行するため、
+            あなたは<span className="text-[#888]">「戦略と撮影」だけ</span>に集中できます。
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {AI_FEATURES.map((f, i) => (
-              <div key={i} className="bg-[#0f0f0f] rounded-2xl p-5 border border-[#2a2a2a] flex gap-4">
+              <div key={i} className="bg-[#0d0d0d] rounded-2xl p-5 border border-[#1a1a1a] hover:border-[#6366F1]/30 transition-colors flex gap-4">
                 <span className="text-2xl shrink-0">{f.icon}</span>
                 <div>
                   <p className="text-sm font-black text-white mb-1">{f.title}</p>
-                  <p className="text-xs text-[#777] leading-relaxed">{f.desc}</p>
+                  <p className="text-xs text-[#666] leading-relaxed">{f.desc}</p>
                 </div>
               </div>
             ))}
@@ -375,50 +581,61 @@ export default function CoursePage() {
         </div>
       </section>
 
-      {/* ⑤ プランカード */}
+      {/* プランカード直前：グルコン導線（比較検討中の人向け） */}
+      <GroupConsultCTA variant="compact" />
+
+      {/* ⑥ プランカード */}
       <section className="max-w-5xl mx-auto px-5 py-16 sm:py-20">
         <p className="text-xs font-bold text-red-400 text-center uppercase tracking-widest mb-2">期間限定 モニター価格</p>
-        <h2 className="text-2xl sm:text-3xl font-black text-center mb-3">プランを選ぶ</h2>
-        <p className="text-[#555] text-center text-sm mb-10">全プランにLINEサポート・Notion教材・AIツールが含まれます</p>
+        <h2 className="text-2xl sm:text-3xl font-black text-center mb-2">プランを選ぶ</h2>
+        <p className="text-[#444] text-center text-sm mb-3">全プランにLINEサポート・Notion教材・AIツールが含まれます</p>
+
+        {/* ミニカウントダウン */}
+        <div className="flex justify-center items-center gap-2 mb-10">
+          <span className="text-red-400 text-xs font-bold">このモニター価格、終了まで残り</span>
+          <span className="text-white text-xs font-black bg-red-500/20 border border-red-500/30 rounded-lg px-2 py-0.5 tabular-nums">
+            {countdown.days}日 {String(countdown.hours).padStart(2, '0')}:{String(countdown.minutes).padStart(2, '0')}:{String(countdown.seconds).padStart(2, '0')}
+          </span>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {PLANS.map(plan => (
             <div
               key={plan.name}
-              className="relative rounded-2xl overflow-hidden flex flex-col"
-              style={{ border: `1.5px solid ${plan.recommended ? plan.color : '#2a2a2a'}` }}
+              className="relative rounded-2xl overflow-hidden flex flex-col transition-transform hover:scale-[1.01]"
+              style={{ border: `1.5px solid ${plan.recommended ? plan.color : '#1f1f1f'}` }}
             >
               {plan.recommended && (
                 <div className="absolute top-0 left-0 right-0 text-center py-1.5 text-xs font-black text-white tracking-wider"
-                  style={{ background: plan.color }}>
+                  style={{ background: `linear-gradient(90deg, ${plan.color}, #8b5cf6)` }}>
                   ⭐ 最もご好評のプラン
                 </div>
               )}
 
               <div className={`p-6 flex-1 flex flex-col ${plan.recommended ? 'pt-10' : ''}`}
-                style={{ background: plan.recommended ? `${plan.color}10` : '#111' }}>
+                style={{ background: plan.recommended ? `${plan.color}0d` : '#0d0d0d' }}>
                 <p className="text-sm font-bold mb-1" style={{ color: plan.accent }}>{plan.name}プラン</p>
-                <p className="text-xs text-[#555] mb-3">{plan.tagline}</p>
+                <p className="text-xs text-[#444] mb-3">{plan.tagline}</p>
                 <div className="inline-flex items-center gap-2 mb-2">
                   <span className="bg-red-500 text-white text-xs font-black rounded-full px-3 py-1">モニター限定50%OFF</span>
                 </div>
                 <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-xl text-red-400 line-through">{plan.originalPrice}</span>
+                  <span className="text-lg text-[#555] line-through">{plan.originalPrice}</span>
                 </div>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-4xl font-black text-white">{plan.price}</span>
-                  <span className="text-xs text-[#777]">税込 / 3ヶ月</span>
+                  <span className="text-xs text-[#555]">税込 / 3ヶ月</span>
                 </div>
                 <div className="flex items-center gap-3 mb-6">
                   <p className="text-xs text-red-400 font-bold">今だけ期間限定</p>
-                  <p className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#1a1a1a] border border-red-400/40 text-red-300">
+                  <p className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#111] border border-red-400/40 text-red-300">
                     残り{plan.slots}名
                   </p>
                 </div>
 
                 <ul className="space-y-2.5 flex-1 mb-6">
                   {plan.features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-[#ccc]">
+                    <li key={i} className="flex items-start gap-2 text-sm text-[#bbb]">
                       <span className="mt-0.5 shrink-0 text-xs font-bold" style={{ color: plan.accent }}>✓</span>
                       {f}
                     </li>
@@ -427,14 +644,14 @@ export default function CoursePage() {
 
                 <button
                   onClick={() => selectPlanAndScroll(plan.name)}
-                  className="w-full py-3 rounded-xl font-bold text-sm transition-all"
+                  className="w-full py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90"
                   style={
                     plan.recommended
-                      ? { background: plan.color, color: '#fff' }
-                      : { background: '#1a1a1a', color: '#fff', border: `1px solid ${plan.color}44` }
+                      ? { background: `linear-gradient(135deg, ${plan.color}, #8b5cf6)`, color: '#fff' }
+                      : { background: '#161616', color: '#fff', border: `1px solid ${plan.color}44` }
                   }
                 >
-                  このプランで申し込む
+                  このプランで申し込む →
                 </button>
               </div>
             </div>
@@ -442,11 +659,12 @@ export default function CoursePage() {
         </div>
       </section>
 
-      {/* ⑥ 3ヶ月の流れ */}
-      <section className="bg-[#111] border-y border-[#1a1a1a]">
+      {/* ⑦ 3ヶ月の流れ */}
+      <section className="bg-[#0a0a0a] border-y border-[#1a1a1a]">
         <div className="max-w-3xl mx-auto px-5 py-16 sm:py-20">
+          <p className="text-xs font-bold text-[#6366F1] text-center uppercase tracking-widest mb-3">Roadmap</p>
           <h2 className="text-2xl sm:text-3xl font-black text-center mb-3">3ヶ月でやること</h2>
-          <p className="text-[#555] text-center text-sm mb-10">「やること」を明確にして、最短ルートで収益化まで走ります</p>
+          <p className="text-[#444] text-center text-sm mb-10">「やること」を明確にして、最短ルートで収益化まで走ります</p>
 
           <div className="space-y-5">
             {STEPS.map((step, i) => (
@@ -456,14 +674,14 @@ export default function CoursePage() {
                     style={{ background: step.color }}>
                     {i + 1}
                   </div>
-                  {i < STEPS.length - 1 && <div className="w-px flex-1 mt-2 bg-[#2a2a2a]" style={{ minHeight: '40px' }} />}
+                  {i < STEPS.length - 1 && <div className="w-px flex-1 mt-2 bg-[#1f1f1f]" style={{ minHeight: '40px' }} />}
                 </div>
-                <div className="bg-[#0f0f0f] rounded-2xl border border-[#2a2a2a] p-5 flex-1 mb-4">
+                <div className="bg-[#0d0d0d] rounded-2xl border border-[#1a1a1a] p-5 flex-1 mb-4">
                   <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: step.color }}>{step.month}</p>
                   <p className="text-base font-black text-white mb-3">{step.title}</p>
                   <ul className="space-y-1.5">
                     {step.details.map((d, j) => (
-                      <li key={j} className="flex items-start gap-2 text-xs text-[#888]">
+                      <li key={j} className="flex items-start gap-2 text-xs text-[#777]">
                         <span className="shrink-0 mt-0.5" style={{ color: step.color }}>▸</span>
                         {d}
                       </li>
@@ -476,53 +694,67 @@ export default function CoursePage() {
         </div>
       </section>
 
-      {/* ⑦ 受講生の声 */}
+      {/* ⑧ 受講生の声 */}
       <section className="max-w-4xl mx-auto px-5 py-16 sm:py-20">
+        <p className="text-xs font-bold text-[#6366F1] text-center uppercase tracking-widest mb-3">Voice</p>
         <h2 className="text-2xl sm:text-3xl font-black text-center mb-3">受講生の変化</h2>
-        <p className="text-[#555] text-center text-sm mb-10">実際の受講生の声（一部）</p>
+        <p className="text-[#444] text-center text-sm mb-10">実際の受講生の声（一部）</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {TESTIMONIALS.map((t, i) => (
-            <div key={i} className="bg-[#111] rounded-2xl p-6 border border-[#1a1a1a] flex flex-col">
+            <div key={i} className="bg-[#0d0d0d] rounded-2xl p-6 border border-[#1a1a1a] flex flex-col">
+              {/* 星 */}
+              <div className="flex gap-0.5 mb-4">
+                {Array.from({ length: t.stars }).map((_, j) => (
+                  <span key={j} className="text-[#F59E0B] text-sm">★</span>
+                ))}
+              </div>
               <div className="flex items-center gap-2 mb-4">
-                <span className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white shrink-0"
+                <span className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black text-white shrink-0"
                   style={{ background: t.color }}>
                   {t.name[0]}
                 </span>
                 <div>
                   <p className="text-xs font-bold text-white">{t.name}</p>
-                  <p className="text-[10px] text-[#555]">{t.plan}プラン受講</p>
+                  <p className="text-[10px] text-[#444]">{t.plan}プラン受講</p>
                 </div>
               </div>
-              <div className="bg-[#0f0f0f] rounded-xl p-3 mb-3 border border-[#2a2a2a]">
-                <p className="text-[10px] text-[#555] mb-1">受講前</p>
-                <p className="text-xs text-[#888]">{t.before}</p>
+
+              {/* 結果バッジ */}
+              <div className="rounded-xl px-3 py-2 mb-3 text-center"
+                style={{ background: `${t.color}15`, border: `1px solid ${t.color}30` }}>
+                <p className="text-xs font-black" style={{ color: t.color }}>{t.result}</p>
               </div>
-              <p className="text-xs text-[#ccc] leading-relaxed flex-1">"{t.after}"</p>
+
+              <div className="bg-[#111] rounded-xl p-3 mb-3 border border-[#1f1f1f]">
+                <p className="text-[10px] text-[#444] mb-1">受講前</p>
+                <p className="text-xs text-[#777]">{t.before}</p>
+              </div>
+              <p className="text-xs text-[#bbb] leading-relaxed flex-1">"{t.after}"</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ⑧ よくある質問 */}
-      <section className="bg-[#111] border-y border-[#1a1a1a]">
+      {/* ⑨ よくある質問 */}
+      <section className="bg-[#0a0a0a] border-y border-[#1a1a1a]">
         <div className="max-w-2xl mx-auto px-5 py-16">
           <h2 className="text-2xl font-black text-center mb-10">よくある質問</h2>
           <div className="space-y-3">
             {FAQS.map((faq, i) => (
-              <div key={i} className="bg-[#0f0f0f] rounded-2xl border border-[#2a2a2a] overflow-hidden">
+              <div key={i} className="bg-[#0d0d0d] rounded-2xl border border-[#1a1a1a] overflow-hidden">
                 <button
-                  className="w-full flex items-center justify-between px-5 py-4 text-left gap-3"
+                  className="w-full flex items-center justify-between px-5 py-4 text-left gap-3 hover:bg-[#111] transition-colors"
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 >
                   <p className="text-sm font-bold text-white">{faq.q}</p>
-                  <span className="text-[#555] text-sm shrink-0 transition-transform duration-200"
+                  <span className="text-[#444] text-sm shrink-0 transition-transform duration-200"
                     style={{ transform: openFaq === i ? 'rotate(90deg)' : 'none', display: 'inline-block' }}>
                     ▶
                   </span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-5 pb-5">
-                    <p className="text-sm text-[#888] leading-relaxed">{faq.a}</p>
+                  <div className="px-5 pb-5 border-t border-[#1a1a1a] pt-4">
+                    <p className="text-sm text-[#777] leading-relaxed">{faq.a}</p>
                   </div>
                 )}
               </div>
@@ -531,14 +763,19 @@ export default function CoursePage() {
         </div>
       </section>
 
-      {/* ⑨ 申込みフォーム */}
+      {/* FAQ直後・申込みフォーム直前：グルコン導線（軽いハードルの選択肢） */}
+      <div className="pt-16 sm:pt-20">
+        <GroupConsultCTA variant="compact" />
+      </div>
+
+      {/* ⑩ 申込みフォーム */}
       <section ref={formRef} className="max-w-xl mx-auto px-5 py-16 sm:py-20">
         <p className="text-xs font-bold text-red-400 text-center uppercase tracking-widest mb-2">残り6名 · モニター価格</p>
         <h2 className="text-2xl font-black text-center mb-2">お申込み</h2>
-        <p className="text-[#555] text-sm text-center mb-10">送信後、3営業日以内にご連絡します</p>
+        <p className="text-[#444] text-sm text-center mb-10">送信後、3営業日以内にご連絡します</p>
 
         {submitted ? (
-          <div className="bg-[#052e16] border border-[#22C55E]/50 rounded-2xl p-8 text-center space-y-3">
+          <div className="bg-[#052e16] border border-[#22C55E]/40 rounded-2xl p-8 text-center space-y-3">
             <p className="text-4xl">🎉</p>
             <p className="text-xl font-black text-white">お申込みありがとうございます！</p>
             <p className="text-sm text-[#86EFAC]">3営業日以内にメールまたはLINEでご連絡します。<br />少々お待ちください。</p>
@@ -546,7 +783,7 @@ export default function CoursePage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm text-[#999] mb-1.5">
+              <label className="block text-sm text-[#777] mb-1.5">
                 お名前 <span className="text-red-400 text-xs">必須</span>
               </label>
               <input
@@ -554,12 +791,12 @@ export default function CoursePage() {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="例：田中りっきー"
-                className="w-full bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder:text-[#444] focus:outline-none focus:border-[#6366F1] transition-colors"
+                className="w-full bg-[#0d0d0d] border border-[#1f1f1f] rounded-xl px-4 py-3 text-white placeholder:text-[#333] focus:outline-none focus:border-[#6366F1] transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-[#999] mb-1.5">
+              <label className="block text-sm text-[#777] mb-1.5">
                 メールアドレス <span className="text-red-400 text-xs">必須</span>
               </label>
               <input
@@ -567,26 +804,26 @@ export default function CoursePage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="example@gmail.com"
-                className="w-full bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder:text-[#444] focus:outline-none focus:border-[#6366F1] transition-colors"
+                className="w-full bg-[#0d0d0d] border border-[#1f1f1f] rounded-xl px-4 py-3 text-white placeholder:text-[#333] focus:outline-none focus:border-[#6366F1] transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-[#999] mb-1.5">プラン選択</label>
+              <label className="block text-sm text-[#777] mb-1.5">プラン選択</label>
               <div className="grid grid-cols-3 gap-2">
                 {PLANS.map(plan => (
                   <button
                     key={plan.name}
                     type="button"
                     onClick={() => setSelectedPlan(plan.name)}
-                    className="rounded-xl py-3 px-2 text-center transition-all border text-sm font-bold"
+                    className="rounded-xl py-3 px-2 text-center transition-all border"
                     style={
                       selectedPlan === plan.name
-                        ? { background: `${plan.color}22`, borderColor: plan.color, color: plan.accent === '#aaa' ? '#fff' : plan.accent }
-                        : { background: '#111', borderColor: '#2a2a2a', color: '#666' }
+                        ? { background: `${plan.color}20`, borderColor: plan.color, color: plan.accent === '#aaa' ? '#fff' : plan.accent }
+                        : { background: '#0d0d0d', borderColor: '#1f1f1f', color: '#555' }
                     }
                   >
-                    <p className="text-xs">{plan.name}</p>
+                    <p className="text-xs font-bold">{plan.name}</p>
                     <p className="text-[10px] mt-0.5 opacity-70">{plan.price}</p>
                   </button>
                 ))}
@@ -594,13 +831,13 @@ export default function CoursePage() {
             </div>
 
             <div>
-              <label className="block text-sm text-[#999] mb-1.5">ご質問・現在の状況 <span className="text-[#555] text-xs">任意</span></label>
+              <label className="block text-sm text-[#777] mb-1.5">ご質問・現在の状況 <span className="text-[#333] text-xs">任意</span></label>
               <textarea
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 rows={4}
                 placeholder="現在のフォロワー数・やりたいジャンル・気になること等、なんでもご記入ください"
-                className="w-full bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder:text-[#444] focus:outline-none focus:border-[#6366F1] transition-colors resize-none"
+                className="w-full bg-[#0d0d0d] border border-[#1f1f1f] rounded-xl px-4 py-3 text-white placeholder:text-[#333] focus:outline-none focus:border-[#6366F1] transition-colors resize-none"
               />
             </div>
 
@@ -609,24 +846,58 @@ export default function CoursePage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-[#6366F1] hover:bg-[#4f46e5] disabled:opacity-50 text-white font-black py-4 rounded-2xl text-base transition-colors"
+              className="w-full disabled:opacity-50 text-white font-black py-4 rounded-2xl text-base transition-all hover:scale-[1.01] shadow-lg shadow-[#6366F1]/20 hover:shadow-[#6366F1]/40"
+              style={{ background: 'linear-gradient(135deg, #6366F1, #8b5cf6)' }}
             >
               {submitting ? '送信中...' : '申し込む →'}
             </button>
 
-            <p className="text-[#444] text-xs text-center leading-relaxed">
+            <p className="text-[#333] text-xs text-center leading-relaxed">
               送信後、3営業日以内にご連絡します。<br />
               お急ぎの方は
-              <a href="https://lin.ee/WhGkd90" className="text-[#6366F1] underline underline-offset-2 mx-1">LINE</a>
+              <a href={LINE_URL} className="text-[#6366F1] underline underline-offset-2 mx-1">LINE</a>
               からお問い合わせください。
             </p>
           </form>
         )}
       </section>
 
-      <footer className="border-t border-[#1a1a1a] py-8 text-center">
-        <p className="text-[#333] text-xs">© 2026 InstaScript AI</p>
+      <footer className="border-t border-[#111] py-8 text-center">
+        <p className="text-[#222] text-xs">© 2026 InstaScript AI</p>
       </footer>
+
+      {/* スティッキーCTAバー */}
+      <div className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ${showStickyBar ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+        <div className="bg-[#0d0d0d]/95 backdrop-blur-md border-t border-[#1f1f1f] px-5 py-3">
+          <div className="max-w-xl mx-auto flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs text-[#888] truncate">モニター限定50%OFF</p>
+              <div className="flex items-center gap-2">
+                <span className="text-white font-black text-sm">残り6名</span>
+                <span className="text-[#444] text-xs">·</span>
+                <span className="text-red-400 text-xs font-bold tabular-nums">
+                  {countdown.days}日 {String(countdown.hours).padStart(2, '0')}:{String(countdown.minutes).padStart(2, '0')} 残り
+                </span>
+              </div>
+            </div>
+            <div className="shrink-0 flex items-center gap-2">
+              <a
+                href={LINE_URL}
+                className="hidden sm:inline-flex items-center gap-1.5 bg-[#06C755] hover:bg-[#05b34c] text-white font-black px-4 py-2.5 rounded-xl text-xs transition-all whitespace-nowrap"
+              >
+                無料グルコン参加
+              </a>
+              <button
+                onClick={scrollToForm}
+                className="text-white font-black px-6 py-2.5 rounded-xl text-sm transition-all hover:scale-[1.02] shadow-lg shadow-[#6366F1]/30"
+                style={{ background: 'linear-gradient(135deg, #6366F1, #8b5cf6)' }}
+              >
+                今すぐ申し込む →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
