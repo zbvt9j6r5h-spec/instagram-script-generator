@@ -52,13 +52,13 @@ if (user.email !== ADMIN_EMAIL) {
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
-  const [allScriptsResult, monthlyCountResult, recentScriptsResult] = await Promise.all([
+  const [allScriptsResult, monthlyCountResult, recentScriptsResult, lpUsersResult] = await Promise.all([
     admin.from('scripts').select('genre, target, theme, user_id'),
     admin.from('scripts').select('*', { count: 'exact', head: true }).gte('created_at', startOfMonth),
     admin.from('scripts').select('genre, target, theme, created_at').order('created_at', { ascending: false }).limit(20),
+    admin.from('user_profiles').select('id, email, source, first_seen_at, last_seen_at').eq('source', 'lp').order('first_seen_at', { ascending: false }),
   ])
 
-  // エラーがあれば詳細を返す
   if (allScriptsResult.error) {
     console.error('[admin/stats] scripts fetch error:', allScriptsResult.error)
     return NextResponse.json({ error: `データ取得エラー: ${allScriptsResult.error.message}` }, { status: 500 })
@@ -66,6 +66,16 @@ if (user.email !== ADMIN_EMAIL) {
 
   const scripts = allScriptsResult.data ?? []
   const totalUsers = new Set(scripts.map((s) => s.user_id)).size
+  const lpUsers = lpUsersResult.data ?? []
+
+  // LP経由ユーザーの利用回数を集計
+  const lpUserIds = lpUsers.map(u => u.id)
+  const lpScriptCounts: Record<string, number> = {}
+  scripts.forEach(s => {
+    if (lpUserIds.includes(s.user_id)) {
+      lpScriptCounts[s.user_id] = (lpScriptCounts[s.user_id] || 0) + 1
+    }
+  })
 
   return NextResponse.json({
     totalUsers,
@@ -75,5 +85,10 @@ if (user.email !== ADMIN_EMAIL) {
     topTargets: topN(scripts.map((s) => s.target), 5),
     topThemes: topN(scripts.map((s) => s.theme), 5),
     recentScripts: recentScriptsResult.data ?? [],
+    lpUsers: lpUsers.map(u => ({
+      ...u,
+      scriptCount: lpScriptCounts[u.id] || 0,
+    })),
+    lpConversionCount: lpUsers.length,
   })
 }

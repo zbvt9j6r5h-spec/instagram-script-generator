@@ -6,6 +6,15 @@ import { supabase } from '@/lib/supabase'
 
 const ADMIN_EMAIL = 'rikicoco0709@gmail.com'
 
+type LPUser = {
+  id: string
+  email: string
+  source: string
+  first_seen_at: string
+  last_seen_at: string
+  scriptCount: number
+}
+
 type Stats = {
   totalUsers: number
   totalScripts: number
@@ -14,7 +23,10 @@ type Stats = {
   topTargets: { name: string; count: number }[]
   topThemes: { name: string; count: number }[]
   recentScripts: { genre: string; target: string; theme: string; created_at: string }[]
+  lpUsers: LPUser[]
+  lpConversionCount: number
 }
+
 export default function AdminPage() {
   const router = useRouter()
   const [stats, setStats] = useState<Stats | null>(null)
@@ -62,10 +74,7 @@ export default function AdminPage() {
         <div className="bg-white rounded-2xl border border-red-200 p-6 max-w-lg w-full">
           <p className="text-sm font-bold text-red-600 mb-2">エラーが発生しました</p>
           <p className="text-sm text-gray-600 whitespace-pre-wrap">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 text-sm text-gray-500 underline"
-          >
+          <button onClick={() => window.location.reload()} className="mt-4 text-sm text-gray-500 underline">
             再読み込み
           </button>
         </div>
@@ -79,10 +88,7 @@ export default function AdminPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <h1 className="text-lg font-bold">管理者ダッシュボード</h1>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="text-sm text-gray-500 hover:text-gray-900"
-            >
+            <button onClick={() => router.push('/dashboard')} className="text-sm text-gray-500 hover:text-gray-900">
               ← アプリへ戻る
             </button>
             <button onClick={handleLogout} className="text-sm text-gray-500 hover:text-gray-900">
@@ -93,8 +99,9 @@ export default function AdminPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
         {/* サマリーカード */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center">
             <p className="text-xs text-gray-500 mb-1">総ユーザー数</p>
             <p className="text-3xl font-bold">{stats!.totalUsers}</p>
@@ -107,6 +114,50 @@ export default function AdminPage() {
             <p className="text-xs text-gray-500 mb-1">今月の生成数</p>
             <p className="text-3xl font-bold">{stats!.monthlyScripts}</p>
           </div>
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center">
+            <p className="text-xs text-gray-500 mb-1">LP経由登録</p>
+            <p className="text-3xl font-bold text-indigo-600">{stats!.lpConversionCount}</p>
+          </div>
+        </div>
+
+        {/* LP経由ユーザー一覧 */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <h2 className="text-sm font-bold text-gray-700 mb-1">LP経由で登録したユーザー</h2>
+          <p className="text-xs text-gray-400 mb-4">LPのログインボタンからGoogleログインした人</p>
+          {stats!.lpUsers.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-4">まだデータがありません</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    <th className="text-left text-xs text-gray-500 pb-2 pr-4">メール</th>
+                    <th className="text-left text-xs text-gray-500 pb-2 pr-4">登録日</th>
+                    <th className="text-left text-xs text-gray-500 pb-2 pr-4">最終ログイン</th>
+                    <th className="text-left text-xs text-gray-500 pb-2">台本生成数</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats!.lpUsers.map((u) => (
+                    <tr key={u.id} className="border-b border-gray-50 last:border-0">
+                      <td className="py-2 pr-4 text-gray-700 max-w-[200px] truncate">{u.email}</td>
+                      <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">
+                        {new Date(u.first_seen_at).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}
+                      </td>
+                      <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">
+                        {new Date(u.last_seen_at).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}
+                      </td>
+                      <td className="py-2">
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${u.scriptCount > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500'}`}>
+                          {u.scriptCount}回
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* TOP5 */}
@@ -137,10 +188,7 @@ export default function AdminPage() {
                     <td className="py-2 pr-4 text-gray-600 max-w-[150px] truncate">{s.theme}</td>
                     <td className="py-2 text-gray-400 whitespace-nowrap">
                       {new Date(s.created_at).toLocaleDateString('ja-JP', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
                       })}
                     </td>
                   </tr>

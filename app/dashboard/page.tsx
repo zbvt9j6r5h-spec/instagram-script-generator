@@ -97,6 +97,24 @@ function DashboardPage() {
       setUser(user)
       setLoading(false)
 
+      // LP流入元の保存（初回ログイン時のみ）
+      const ref = localStorage.getItem('signup_ref')
+      if (ref) {
+        await supabase.from('user_profiles').upsert({
+          id: user.id,
+          email: user.email,
+          source: ref,
+          first_seen_at: new Date().toISOString(),
+        }, { onConflict: 'id', ignoreDuplicates: true })
+        localStorage.removeItem('signup_ref')
+      } else {
+        await supabase.from('user_profiles').upsert({
+          id: user.id,
+          email: user.email,
+          last_seen_at: new Date().toISOString(),
+        }, { onConflict: 'id', ignoreDuplicates: true })
+      }
+
       const now = new Date()
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
       const { count } = await supabase
@@ -265,32 +283,39 @@ function DashboardPage() {
         </div>
       </header>
 
-      {/* タブナビ */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2">
-        <div className="flex border-b border-[#2a2a2a] overflow-x-auto">
-          <button className="px-4 py-3 text-sm font-bold text-white border-b-2 border-white shrink-0 whitespace-nowrap min-h-[44px]">
-            台本生成
-          </button>
-          <button
-            onClick={() => router.push('/analyze')}
-            className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
-          >
-            ベンチマーク分析
-          </button>
-          <button
-            onClick={() => router.push('/account-analysis')}
-            className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
-          >
-            アカウント分析
-          </button>
-          <button
-            onClick={() => router.push('/learning')}
-            className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
-          >
-            学びログ
-          </button>
-        </div>
-      </div>
+    {/* タブナビ */}
+<div className="max-w-5xl mx-auto px-4 sm:px-6 py-2">
+  <div className="flex border-b border-[#2a2a2a] overflow-x-auto">
+    <button className="px-4 py-3 text-sm font-bold text-white border-b-2 border-white shrink-0 whitespace-nowrap min-h-[44px]">
+      台本生成
+    </button>
+    <button
+      onClick={() => router.push('/analyze')}
+      className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
+    >
+      ベンチマーク分析
+    </button>
+    <button
+      onClick={() => router.push('/account-analysis')}
+      className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
+    >
+      アカウント分析
+    </button>
+    <button
+      onClick={() => router.push('/learning')}
+      className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
+    >
+      学びログ
+    </button>
+    {/* ↓ これを追加 */}
+    <button
+      onClick={() => router.push('/webhook')}
+      className="px-4 py-3 text-sm text-[#666] hover:text-white shrink-0 whitespace-nowrap min-h-[44px] transition-colors"
+    >
+      ⚙ 連携設定
+    </button>
+  </div>
+</div>
 
       {/* メインコンテンツ：2カラム */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">

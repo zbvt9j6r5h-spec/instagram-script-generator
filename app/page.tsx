@@ -81,11 +81,11 @@ export default function LandingPage() {
             <span className="text-white font-black text-sm tracking-wide">InstaScript AI</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm text-white/60 hover:text-white transition-colors hidden sm:inline">
+            <Link href="/login?ref=lp" className="text-sm text-white/60 hover:text-white transition-colors hidden sm:inline">
               ログイン
             </Link>
             <Link
-              href="/login"
+              href="/login?ref=lp"
               className="text-xs font-bold text-white px-4 py-2 rounded-full transition-all hover:scale-[1.03]"
               style={{ background: 'linear-gradient(135deg, #6366F1, #8b5cf6)' }}
             >
@@ -132,7 +132,7 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
               <Link
-                href="/login"
+                href="/login?ref=lp"
                 className="group inline-flex items-center justify-center gap-2 text-white font-black px-9 py-4 rounded-2xl text-base transition-all shadow-lg shadow-[#6366F1]/30 hover:shadow-[#6366F1]/50 hover:scale-[1.02]"
                 style={{ background: 'linear-gradient(135deg, #6366F1, #8b5cf6)' }}
               >
@@ -369,7 +369,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
-              href="/login"
+              href="/login?ref=lp"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white font-black text-base px-10 py-4 rounded-2xl transition-all shadow-lg shadow-[#6366F1]/30 hover:shadow-[#6366F1]/50 hover:scale-[1.02]"
               style={{ background: 'linear-gradient(135deg, #6366F1, #8b5cf6)' }}
             >
@@ -393,7 +393,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-[#444]">
           <span>© 2026 InstaScript AI · Powered by Claude</span>
           <div className="flex gap-4">
-            <Link href="/login" className="hover:text-white/60 transition-colors">ログイン</Link>
+            <Link href="/login?ref=lp" className="hover:text-white/60 transition-colors">ログイン</Link>
             <Link href="/feedback" className="hover:text-white/60 transition-colors">フィードバック</Link>
           </div>
         </div>
